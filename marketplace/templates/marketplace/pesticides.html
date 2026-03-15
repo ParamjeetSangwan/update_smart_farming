@@ -1,136 +1,291 @@
 {% load static %}
 {% load marketplace_filters %}
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Pesticides & Fertilizers</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarming | Pesticides & Fertilizers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed;
-            background-size: cover;
-            background-attachment: fixed;
-            font-family: 'Segoe UI', sans-serif;
+        :root {
+            --bg:#060e0f; --bg2:#0a1a1c;
+            --teal:#14b8a6; --teal-lt:#2dd4bf;
+            --tg:rgba(20,184,166,0.12); --tb:rgba(20,184,166,0.22);
+            --card:rgba(255,255,255,0.04); --cb:rgba(255,255,255,0.07);
+            --text:#edfcfa; --muted:rgba(237,252,250,0.5); --dim:rgba(237,252,250,0.28);
+            --green:#22c55e; --gold:#f59e0b; --red:#f43f5e; --blue:#3b82f6;
         }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
-        .container {
-            background: rgba(75, 74, 74, 0.7); /* Transparent */
-            margin: 60px auto;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 1000px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        /* orbs — teal palette to differentiate from tools page */
+        .orb{position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(85px)}
+        .o1{width:550px;height:550px;top:-200px;right:-180px;background:radial-gradient(circle,rgba(20,184,166,.09) 0%,transparent 70%)}
+        .o2{width:420px;height:420px;bottom:-130px;left:-110px;background:radial-gradient(circle,rgba(20,184,166,.06) 0%,transparent 70%)}
+        .o3{width:300px;height:300px;top:38%;left:55%;background:radial-gradient(circle,rgba(59,130,246,.04) 0%,transparent 70%)}
+
+        /* topbar */
+        .topbar{position:sticky;top:0;z-index:200;height:62px;background:rgba(6,14,15,.9);backdrop-filter:blur(22px);border-bottom:1px solid var(--cb);display:flex;align-items:center;padding:0 32px;gap:14px}
+        .brand{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+        .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);animation:blink 2s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+        .tbr{margin-left:auto;display:flex;align-items:center;gap:10px}
+        .tbl{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--cb);border-radius:9px;color:var(--muted);font-size:13px;font-weight:500;text-decoration:none;transition:all .2s}
+        .tbl:hover{border-color:var(--tb);color:var(--teal);background:var(--tg)}
+        .tbc{display:flex;align-items:center;gap:7px;padding:8px 18px;background:var(--teal);border-radius:10px;color:var(--bg);font-size:13px;font-weight:700;text-decoration:none;transition:all .2s;box-shadow:0 0 18px rgba(20,184,166,.22)}
+        .tbc:hover{background:var(--teal-lt);transform:translateY(-1px)}
+
+        /* hero */
+        .hero{max-width:1200px;margin:0 auto;padding:54px 32px 38px;position:relative;z-index:1;animation:up .55s ease}
+        .pill-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 13px;background:var(--tg);border:1px solid var(--tb);border-radius:20px;font-size:11px;font-weight:600;color:var(--teal);letter-spacing:.6px;text-transform:uppercase;margin-bottom:20px}
+        .hero h1{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,50px);font-weight:800;line-height:1.08;margin-bottom:13px}
+        .acc{color:var(--teal)}
+        .hero p{font-size:15px;color:var(--muted);max-width:460px;line-height:1.7;margin-bottom:26px}
+        .kpis{display:flex;gap:34px;flex-wrap:wrap}
+        .kpi{display:flex;flex-direction:column;gap:3px}
+        .kn{font-family:'Syne',sans-serif;font-size:23px;font-weight:800;color:var(--teal);line-height:1}
+        .kl{font-size:11px;color:var(--dim);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+
+        /* type tabs — for pesticides vs fertilizers */
+        .type-tabs{max-width:1200px;margin:0 auto;padding:0 32px 0;display:flex;gap:10px;flex-wrap:wrap}
+        .tab{
+            display:flex;align-items:center;gap:7px;
+            padding:9px 18px;border-radius:12px;
+            border:1px solid var(--cb);background:var(--card);
+            color:var(--muted);font-size:13px;font-weight:500;
+            cursor:pointer;transition:all .2s;text-decoration:none;
         }
+        .tab:hover,.tab.on{border-color:var(--tb);color:var(--teal);background:var(--tg)}
+        .tab .dot{width:7px;height:7px;border-radius:50%}
+        .dot-all{background:var(--teal)}
+        .dot-insect{background:#f59e0b}
+        .dot-fung{background:#a855f7}
+        .dot-fert{background:#22c55e}
+        .dot-herb{background:#f43f5e}
 
-        h1 {
-            text-align: center;
-            font-size: 36px;
-            color: #e1e4e9;
-            margin-bottom: 20px;
+        /* sticky search */
+        .sbar{position:sticky;top:62px;z-index:150;background:rgba(6,14,15,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--cb);padding:12px 32px}
+        .srow{max-width:1200px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+        .fsearch{flex:1;min-width:200px;position:relative}
+        .fsearch i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:12px}
+        .fsearch input{width:100%;padding:10px 13px 10px 38px;background:var(--card);border:1px solid var(--cb);border-radius:10px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s}
+        .fsearch input::placeholder{color:var(--dim)}
+        .fsearch input:focus{border-color:var(--tb);background:rgba(20,184,166,.05)}
+        .fsel{padding:10px 13px;background:var(--card);border:1px solid var(--cb);border-radius:10px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;transition:all .2s;min-width:138px}
+        .fsel option{background:var(--bg2)}
+        .fsel:focus{border-color:var(--tb)}
+        .fbtn{padding:10px 20px;background:var(--teal);border:none;border-radius:10px;color:var(--bg);font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+        .fbtn:hover{background:var(--teal-lt)}
+        .fclr{padding:10px 14px;border:1px solid var(--cb);border-radius:10px;color:var(--muted);font-size:13px;font-weight:500;text-decoration:none;transition:all .2s}
+        .fclr:hover{border-color:var(--red);color:var(--red)}
+
+        /* main */
+        .main{max-width:1200px;margin:0 auto;padding:28px 32px 70px;position:relative;z-index:1}
+        .meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+        .cnt{font-size:14px;color:var(--muted)}.cnt b{color:var(--text);font-weight:600}
+        .vbtns{display:flex;gap:4px}
+        .vb{width:33px;height:33px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--cb);background:var(--card);color:var(--dim);cursor:pointer;transition:all .2s;font-size:12px}
+        .vb.on,.vb:hover{border-color:var(--tb);color:var(--teal);background:var(--tg)}
+
+        /* grid */
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:18px}
+        .grid.lv{grid-template-columns:1fr}
+
+        /* card */
+        .card{background:var(--card);border:1px solid var(--cb);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:all .3s cubic-bezier(.4,0,.2,1);animation:up .5s ease both;position:relative;text-decoration:none;color:inherit}
+        .card::after{content:'';position:absolute;inset:0;border-radius:18px;background:linear-gradient(135deg,rgba(20,184,166,.05),transparent 55%);opacity:0;transition:opacity .3s;pointer-events:none}
+        .card:hover{border-color:var(--tb);background:rgba(255,255,255,.065);transform:translateY(-5px);box-shadow:0 22px 44px rgba(0,0,0,.35),0 0 0 1px var(--tb)}
+        .card:hover::after{opacity:1}
+        .card:nth-child(1){animation-delay:.04s}.card:nth-child(2){animation-delay:.08s}.card:nth-child(3){animation-delay:.12s}
+        .card:nth-child(4){animation-delay:.16s}.card:nth-child(5){animation-delay:.20s}.card:nth-child(6){animation-delay:.24s}
+        .card:nth-child(7){animation-delay:.28s}.card:nth-child(8){animation-delay:.32s}
+
+        .cimg{position:relative;height:188px;overflow:hidden;background:linear-gradient(135deg,rgba(20,184,166,.07),rgba(6,14,15,.9))}
+        .cimg img{width:100%;height:100%;object-fit:cover;transition:transform .45s ease}
+        .card:hover .cimg img{transform:scale(1.06)}
+        .cph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px}
+
+        /* type indicator dot on card */
+        .ctype{position:absolute;top:11px;left:11px;padding:3px 10px;background:rgba(6,14,15,.82);border:1px solid var(--tb);border-radius:20px;font-size:10px;font-weight:600;color:var(--teal);backdrop-filter:blur(8px);letter-spacing:.4px;text-transform:uppercase}
+
+        .cfav{position:absolute;top:11px;right:11px;width:31px;height:31px;border-radius:50%;background:rgba(6,14,15,.82);border:1px solid var(--cb);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:12px;color:var(--dim);backdrop-filter:blur(8px)}
+        .cfav:hover{color:var(--red);border-color:rgba(244,63,94,.35)}
+        .cfav.liked{color:var(--red);border-color:rgba(244,63,94,.35)}
+
+        .cbody{padding:18px;display:flex;flex-direction:column;flex:1}
+        .crow{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+        .cname{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);line-height:1.25}
+        .cstars{display:flex;gap:2px;flex-shrink:0;margin-top:1px}
+        .cstars i{font-size:10px;color:var(--gold)}
+        .cdesc{font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:15px;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+        .cfoot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+        .cprice{display:flex;flex-direction:column;gap:1px}
+        .ptag{font-size:10px;color:var(--dim);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+        .pval{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--text)}
+        .pval small{font-size:13px;font-weight:600;color:var(--teal)}
+
+        .dbtn{display:flex;align-items:center;gap:6px;padding:9px 15px;background:var(--teal);border-radius:10px;color:var(--bg);font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;white-space:nowrap;box-shadow:0 4px 12px rgba(20,184,166,.18)}
+        .dbtn:hover{background:var(--teal-lt);transform:translateY(-1px);box-shadow:0 6px 16px rgba(20,184,166,.28)}
+
+        /* list view */
+        .grid.lv .card{flex-direction:row}
+        .grid.lv .cimg{width:148px;height:auto;min-height:130px;flex-shrink:0;border-radius:0}
+        .grid.lv .cbody{padding:18px 22px}
+        .grid.lv .cdesc{-webkit-line-clamp:1}
+
+        /* empty */
+        .empty{text-align:center;padding:90px 20px;animation:up .5s ease}
+        .ei{font-size:58px;opacity:.22;margin-bottom:14px;display:block}
+        .empty h3{font-family:'Syne',sans-serif;font-size:20px;margin-bottom:8px}
+        .empty p{color:var(--muted);font-size:14px}
+
+        @keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+        @media(max-width:768px){
+            .topbar,.sbar{padding-left:16px;padding-right:16px}
+            .hero,.type-tabs{padding-left:16px;padding-right:16px}
+            .main{padding:20px 16px 54px}
+            .grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
         }
-
-        .back-btn {
-            display: inline-block;
-            text-decoration: none;
-            background: rgba(113, 128, 150, 0.9);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .back-btn:hover {
-            background-color: rgba(74, 85, 104, 0.95);
-        }
-
-        .pesticide-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .pesticide-card {
-            background-color: rgba(76, 74, 74, 0.6); /* Transparent */
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-            transition: 0.3s;
-            text-align: center;
-        }
-
-        .pesticide-card:hover {
-            transform: scale(1.02);
-        }
-
-        .pesticide-card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-
-        .pesticide-card h3 {
-            margin: 10px 0;
-            font-size: 20px;
-            color: #eeeff0;
-        }
-
-        .pesticide-card p {
-            margin: 5px 0;
-            font-size: 15px;
-            color: #f4ecec;
-        }
-
-        .price {
-            color: #dee8e3;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .details-btn {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 8px 18px;
-            background-color: rgba(0, 123, 255, 0.9);
-            color: #ded5d5;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-
-        .details-btn:hover {
-            background-color: rgba(0, 86, 179, 0.95);
+        @media(max-width:480px){
+            .grid{grid-template-columns:1fr}
+            .hero h1{font-size:26px}
+            .kpis{gap:20px}
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Pesticides & Fertilizers</h1>
 
-    <!-- Back Button -->
-    <a href="{% url 'marketplace:marketplace_home' %}" class="back-btn">← Back</a>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div class="orb o3"></div>
 
-    <!-- Pesticides Grid -->
-    {% if pesticides %}
-        <div class="pesticide-grid">
-            {% for pesticide in pesticides %}
-                <div class="pesticide-card">
-                    <!-- {% if pesticide.image %}
-                        <img src="{{ pesticide.image.url }}" alt="{{ pesticide.name }}">
-                    {% else %}
-                        <img src="{% static 'images/default.png' %}" alt="No image available">
-                    {% endif %} -->
-                    <h3>{{ pesticide.name }}</h3>
-                    <p><strong>Category:</strong> {{ pesticide.category }}</p>
-                    <p class="price">₹{{ pesticide.price }}</p>
-                    <a href="{% url 'marketplace:pesticide_detail' pesticide.id %}" class="details-btn">View Details</a>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p style="text-align:center;">No pesticides or fertilizers available.</p>
-    {% endif %}
+<!-- TOPBAR -->
+<header class="topbar">
+    <a href="{% url 'marketplace:marketplace_home' %}" class="brand">
+        <div class="brand-dot"></div>SmartFarming
+    </a>
+    <div class="tbr">
+        <a href="{% url 'marketplace:tools_view' %}" class="tbl"><i class="fas fa-screwdriver-wrench"></i> Tools</a>
+        {% if request.user.is_staff %}
+        <a href="{% url 'admin_dashboard' %}" class="tbl"><i class="fas fa-shield-alt"></i> Admin</a>
+        {% else %}
+        <a href="{% url 'dashboard' %}" class="tbl"><i class="fas fa-home"></i> Dashboard</a>
+        {% endif %}
+        <a href="{% url 'marketplace:cart_view' %}" class="tbc"><i class="fas fa-cart-shopping"></i> Cart</a>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="pill-badge"><i class="fas fa-flask"></i> Crop Protection Store</div>
+    <h1>Protect Crops,<br><span class="acc">Maximise Yield</span></h1>
+    <p>Effective pesticides, organic fertilizers, herbicides and soil enhancers — everything to keep your crops healthy and your harvest strong.</p>
+    <div class="kpis">
+        <div class="kpi"><span class="kn">{{ pesticides|length }}</span><span class="kl">Products</span></div>
+        <div class="kpi"><span class="kn">100%</span><span class="kl">Certified Safe</span></div>
+        <div class="kpi"><span class="kn">Free</span><span class="kl">Delivery ₹1500+</span></div>
+    </div>
+</section>
+
+<!-- TYPE TABS -->
+<div class="type-tabs" style="padding-bottom:20px">
+    <a href="{% url 'marketplace:pesticides_view' %}" class="tab on">
+        <div class="dot dot-all"></div> All Products
+    </a>
+    <a href="?type=insecticide" class="tab">
+        <div class="dot dot-insect"></div> Insecticides
+    </a>
+    <a href="?type=fungicide" class="tab">
+        <div class="dot dot-fung"></div> Fungicides
+    </a>
+    <a href="?type=fertilizer" class="tab">
+        <div class="dot dot-fert"></div> Fertilizers
+    </a>
+    <a href="?type=herbicide" class="tab">
+        <div class="dot dot-herb"></div> Herbicides
+    </a>
 </div>
+
+<!-- SEARCH BAR -->
+<div class="sbar">
+    <form method="get" class="srow">
+        <div class="fsearch">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="text" name="search" placeholder="Search pesticides, fertilizers…" value="{{ request.GET.search }}">
+        </div>
+        <select name="sort" class="fsel">
+            <option value="">Sort: Default</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="name">Name A–Z</option>
+        </select>
+        <button type="submit" class="fbtn"><i class="fas fa-magnifying-glass"></i> Search</button>
+        {% if request.GET.search %}
+        <a href="{% url 'marketplace:pesticides_view' %}" class="fclr"><i class="fas fa-xmark"></i> Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+    <div class="meta">
+        <span class="cnt">Showing <b>{{ pesticides|length }}</b> product{% if pesticides|length != 1 %}s{% endif %}</span>
+        <div class="vbtns">
+            <button class="vb on" id="gb" onclick="sv('g')"><i class="fas fa-grid-2"></i></button>
+            <button class="vb" id="lb" onclick="sv('l')"><i class="fas fa-list"></i></button>
+        </div>
+    </div>
+
+    {% if pesticides %}
+    <div class="grid" id="g">
+        {% for pesticide in pesticides %}
+        <a href="{% url 'marketplace:pesticide_detail' pesticide.id %}" class="card">
+            <div class="cimg">
+                {% if pesticide.image %}<img src="{{ pesticide.image.url }}" alt="{{ pesticide.name }}" loading="lazy">
+                {% else %}<div class="cph">🧪</div>{% endif %}
+                <span class="ctype">Pesticide</span>
+                <button class="cfav" onclick="fav(event,this)"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="cbody">
+                <div class="crow">
+                    <div class="cname">{{ pesticide.name }}</div>
+                    <div class="cstars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div>
+                </div>
+                <div class="cdesc">{{ pesticide.description }}</div>
+                <div class="cfoot">
+                    <div class="cprice">
+                        <span class="ptag">Price</span>
+                        <span class="pval"><small>₹</small>{{ pesticide.price|floatformat:0 }}</span>
+                    </div>
+                    <span class="dbtn"><i class="fas fa-eye"></i> View Details</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+        <span class="ei">🔍</span>
+        <h3>No products found</h3>
+        <p>Try adjusting your search terms.</p>
+    </div>
+    {% endif %}
+</main>
+
+<script>
+function sv(v){
+    const g=document.getElementById('g'),gb=document.getElementById('gb'),lb=document.getElementById('lb');
+    if(v==='l'){g.classList.add('lv');lb.classList.add('on');gb.classList.remove('on')}
+    else{g.classList.remove('lv');gb.classList.add('on');lb.classList.remove('on')}
+}
+function fav(e,b){
+    e.preventDefault();e.stopPropagation();
+    b.classList.toggle('liked');
+    b.querySelector('i').className=b.classList.contains('liked')?'fas fa-heart':'far fa-heart';
+}
+</script>
 </body>
 </html>

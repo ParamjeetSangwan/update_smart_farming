@@ -3,142 +3,281 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ pesticide.name }} - Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarming | {{ pesticide.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed;
-            background-size: cover;
-            margin: 0;
-            padding: 0;
+        :root {
+            --bg:#060e0f; --bg2:#0a1a1c; --bg3:#0e2224;
+            --teal:#14b8a6; --teal-lt:#2dd4bf;
+            --tg:rgba(20,184,166,0.12); --tb:rgba(20,184,166,0.22);
+            --card:rgba(255,255,255,0.04); --cb:rgba(255,255,255,0.07);
+            --text:#edfcfa; --muted:rgba(237,252,250,0.5); --dim:rgba(237,252,250,0.28);
+            --green:#22c55e; --gold:#f59e0b; --red:#f43f5e;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+        .orb{position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(90px)}
+        .o1{width:500px;height:500px;top:-150px;right:-100px;background:radial-gradient(circle,rgba(20,184,166,.08) 0%,transparent 70%)}
+        .o2{width:400px;height:400px;bottom:-100px;left:-80px;background:radial-gradient(circle,rgba(20,184,166,.05) 0%,transparent 70%)}
+
+        /* topbar */
+        .topbar{position:sticky;top:0;z-index:200;height:62px;background:rgba(6,14,15,.9);backdrop-filter:blur(22px);border-bottom:1px solid var(--cb);display:flex;align-items:center;padding:0 32px;gap:14px}
+        .brand{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+        .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);animation:blink 2s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+        .tbr{margin-left:auto;display:flex;align-items:center;gap:10px}
+        .tbl{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--cb);border-radius:9px;color:var(--muted);font-size:13px;font-weight:500;text-decoration:none;transition:all .2s}
+        .tbl:hover{border-color:var(--tb);color:var(--teal);background:var(--tg)}
+        .tbc{display:flex;align-items:center;gap:7px;padding:8px 18px;background:var(--teal);border-radius:10px;color:var(--bg);font-size:13px;font-weight:700;text-decoration:none;transition:all .2s;box-shadow:0 0 18px rgba(20,184,166,.22)}
+        .tbc:hover{background:var(--teal-lt);transform:translateY(-1px)}
+
+        /* breadcrumb */
+        .breadcrumb{max-width:1100px;margin:0 auto;padding:20px 32px 0;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim);position:relative;z-index:1;animation:up .4s ease}
+        .breadcrumb a{color:var(--muted);text-decoration:none;transition:color .2s}
+        .breadcrumb a:hover{color:var(--teal)}
+        .breadcrumb i{font-size:10px}
+
+        /* main layout */
+        .main{max-width:1100px;margin:0 auto;padding:28px 32px 80px;position:relative;z-index:1}
+
+        .detail{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;margin-bottom:56px}
+
+        /* image side */
+        .img-side{animation:up .5s ease}
+        .img-main{
+            aspect-ratio:1;border-radius:22px;overflow:hidden;
+            background:linear-gradient(135deg,rgba(20,184,166,.08),rgba(6,14,15,.95));
+            border:1px solid var(--cb);
+            display:flex;align-items:center;justify-content:center;
+            position:relative;
+        }
+        .img-main img{width:100%;height:100%;object-fit:cover;border-radius:22px}
+        .img-placeholder{font-size:100px;opacity:.35}
+        .img-badge{
+            position:absolute;top:16px;left:16px;
+            padding:5px 13px;
+            background:rgba(6,14,15,.88);border:1px solid var(--tb);border-radius:20px;
+            font-size:11px;font-weight:700;color:var(--teal);
+            backdrop-filter:blur(8px);letter-spacing:.5px;text-transform:uppercase;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 60px auto;
-            background: rgba(68, 67, 67, 0.7); /* Transparent */
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        }
+        /* info side */
+        .info-side{animation:up .5s ease .06s both}
+        .info-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--tg);border:1px solid var(--tb);border-radius:20px;font-size:11px;font-weight:600;color:var(--teal);letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px}
+        .info-name{font-family:'Syne',sans-serif;font-size:clamp(24px,3vw,36px);font-weight:800;line-height:1.1;margin-bottom:14px}
+        .stars-row{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+        .stars{display:flex;gap:3px}
+        .stars i{font-size:13px;color:var(--gold)}
+        .review-cnt{font-size:13px;color:var(--muted)}
 
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 20px;
-            text-decoration: none;
-            background: rgba(113, 128, 150, 0.9);
-            color: white;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
+        .info-desc{font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--cb)}
 
-        .back-btn:hover {
-            background-color: rgba(74, 85, 104, 0.95);
-        }
+        /* features list */
+        .features{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+        .feat{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+        .feat-icon{width:28px;height:28px;border-radius:8px;background:var(--tg);border:1px solid var(--tb);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--teal);font-size:11px}
 
-        .detail {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            align-items: flex-start;
-        }
+        /* price block */
+        .price-block{background:var(--card);border:1px solid var(--cb);border-radius:16px;padding:22px;margin-bottom:20px}
+        .price-row{display:flex;align-items:flex-end;gap:12px;margin-bottom:6px}
+        .price-main{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;line-height:1}
+        .price-main small{font-size:20px;font-weight:600;color:var(--teal)}
+        .price-tag{font-size:12px;color:var(--dim);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
+        .delivery-note{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+        .delivery-note i{color:var(--green)}
 
-        .detail img {
-            flex: 1 1 350px;
-            max-width: 350px;
-            height: auto;
-            border-radius: 12px;
-            object-fit: contain;
-            background: rgba(241, 238, 238, 0.6); /* Transparent image box */
-            padding: 10px;
-        }
+        /* qty + add */
+        .order-row{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+        .qty-wrap{display:flex;align-items:center;border:1px solid var(--cb);border-radius:10px;overflow:hidden}
+        .qty-btn{width:38px;height:42px;background:var(--card);border:none;color:var(--muted);font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+        .qty-btn:hover{background:var(--tg);color:var(--teal)}
+        .qty-inp{width:48px;height:42px;background:transparent;border:none;border-left:1px solid var(--cb);border-right:1px solid var(--cb);color:var(--text);font-size:14px;font-weight:600;text-align:center;font-family:'DM Sans',sans-serif;outline:none}
+        .add-to-cart{flex:1;min-width:160px;padding:12px 24px;background:var(--teal);border:none;border-radius:10px;color:var(--bg);font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(20,184,166,.25);text-decoration:none}
+        .add-to-cart:hover{background:var(--teal-lt);transform:translateY(-2px);box-shadow:0 8px 24px rgba(20,184,166,.35)}
+        .wishlist-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--cb);background:var(--card);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:14px}
+        .wishlist-btn:hover{border-color:rgba(244,63,94,.35);color:var(--red)}
 
-        .info {
-            flex: 2 1 400px;
-        }
+        /* safe badge */
+        .safe-badge{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);border-radius:10px;font-size:13px;color:rgba(34,197,94,.85)}
+        .safe-badge i{font-size:14px;color:var(--green)}
 
-        .info h1 {
-            font-size: 28px;
-            margin-bottom: 15px;
-            color: #e9ebec;
-        }
+        /* info tabs */
+        .tabs{display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid var(--cb)}
+        .tab-btn{padding:12px 22px;border:none;background:transparent;color:var(--muted);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;position:relative;top:1px}
+        .tab-btn:hover{color:var(--text)}
+        .tab-btn.on{color:var(--teal);border-bottom-color:var(--teal)}
+        .tab-content{display:none;font-size:14px;color:var(--muted);line-height:1.75;animation:up .3s ease}
+        .tab-content.show{display:block}
 
-        .info p {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #f3f0f0;
-        }
+        /* related */
+        .related-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:18px}
+        .related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+        .rel-card{background:var(--card);border:1px solid var(--cb);border-radius:14px;overflow:hidden;transition:all .2s;text-decoration:none;color:inherit;display:block}
+        .rel-card:hover{border-color:var(--tb);transform:translateY(-3px)}
+        .rel-img{height:130px;background:linear-gradient(135deg,rgba(20,184,166,.06),rgba(6,14,15,.9));display:flex;align-items:center;justify-content:center;font-size:40px;overflow:hidden}
+        .rel-img img{width:100%;height:100%;object-fit:cover}
+        .rel-body{padding:14px}
+        .rel-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:6px;line-height:1.3}
+        .rel-price{font-size:14px;font-weight:700;color:var(--teal)}
 
-        .price {
-            font-size: 20px;
-            font-weight: bold;
-            color: #38a169;
-            margin: 15px 0;
-        }
+        @keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-        form {
-            margin-top: 20px;
-        }
-
-        label {
-            font-size: 15px;
-            font-weight: 500;
-            margin-right: 10px;
-        }
-
-        input[type="number"] {
-            width: 80px;
-            padding: 6px;
-            font-size: 15px;
-            border: 1px solid #bbb;
-            border-radius: 6px;
-            margin-right: 15px;
-            background: rgba(239, 236, 236, 0.8);
-        }
-
-        button {
-            padding: 10px 18px;
-            font-size: 15px;
-            background-color: rgba(56, 161, 105, 0.9);
-            border: none;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: rgba(47, 133, 90, 0.95);
+        @media(max-width:900px){.detail{grid-template-columns:1fr}}
+        @media(max-width:768px){
+            .topbar{padding-left:16px;padding-right:16px}
+            .breadcrumb{padding-left:16px;padding-right:16px}
+            .main{padding:20px 16px 56px}
         }
     </style>
 </head>
 <body>
-    <div class="container">
 
-        <!-- Back Button -->
-        <a href="{% url 'marketplace:pesticides_view' %}" class="back-btn">← Back to Pesticides</a>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
 
-        <!-- Product Detail -->
-        <!-- <div class="detail">
-            {% if pesticide.image %}
+<!-- TOPBAR -->
+<header class="topbar">
+    <a href="{% url 'marketplace:marketplace_home' %}" class="brand">
+        <div class="brand-dot"></div>SmartFarming
+    </a>
+    <div class="tbr">
+        <a href="{% url 'marketplace:pesticides_view' %}" class="tbl"><i class="fas fa-arrow-left"></i> Back</a>
+        {% if request.user.is_staff %}
+        <a href="{% url 'admin_dashboard' %}" class="tbl"><i class="fas fa-shield-alt"></i> Admin</a>
+        {% else %}
+        <a href="{% url 'dashboard' %}" class="tbl"><i class="fas fa-home"></i> Dashboard</a>
+        {% endif %}
+        <a href="{% url 'marketplace:cart_view' %}" class="tbc"><i class="fas fa-cart-shopping"></i> Cart</a>
+    </div>
+</header>
+
+<!-- BREADCRUMB -->
+<nav class="breadcrumb">
+    <a href="{% url 'marketplace:marketplace_home' %}">Marketplace</a>
+    <i class="fas fa-chevron-right"></i>
+    <a href="{% url 'marketplace:pesticides_view' %}">Pesticides</a>
+    <i class="fas fa-chevron-right"></i>
+    <span style="color:var(--text)">{{ pesticide.name }}</span>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+    <div class="detail">
+
+        <!-- LEFT: IMAGE -->
+        <div class="img-side">
+            <div class="img-main">
+                {% if pesticide.image %}
                 <img src="{{ pesticide.image.url }}" alt="{{ pesticide.name }}">
-            {% else %}
-                <img src="{% static 'images/default.png' %}" alt="No image available">
-            {% endif %} -->
+                {% else %}
+                <div class="img-placeholder">🧪</div>
+                {% endif %}
+                <span class="img-badge">Pesticide</span>
+            </div>
+        </div>
 
-            <div class="info">
-                <h1>{{ pesticide.name }}</h1>
-                <p><strong>Description:</strong> {{ pesticide.description }}</p>
-                <p class="price">₹{{ pesticide.price }}</p>
+        <!-- RIGHT: INFO -->
+        <div class="info-side">
+            <div class="info-pill"><i class="fas fa-flask"></i> Crop Protection</div>
+            <h1 class="info-name">{{ pesticide.name }}</h1>
 
-                <form method="post" action="{% url 'marketplace:add_pesticide_to_cart' pesticide.id %}">
-                    {% csrf_token %}
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" name="quantity" id="quantity" value="1" min="1" required>
-                    <button type="submit">Add to Cart</button>
-                </form>
+            <div class="stars-row">
+                <div class="stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+                <span class="review-cnt">4.0 · 28 reviews</span>
+            </div>
+
+            <p class="info-desc">{{ pesticide.description }}</p>
+
+            <!-- Feature highlights -->
+            <div class="features">
+                <div class="feat"><div class="feat-icon"><i class="fas fa-shield-check"></i></div>Government approved & certified safe</div>
+                <div class="feat"><div class="feat-icon"><i class="fas fa-leaf"></i></div>Effective against common crop diseases</div>
+                <div class="feat"><div class="feat-icon"><i class="fas fa-droplet"></i></div>Easy to mix — clear dosage instructions</div>
+                <div class="feat"><div class="feat-icon"><i class="fas fa-box"></i></div>Sealed packaging, long shelf life</div>
+            </div>
+
+            <!-- Price + Order -->
+            <div class="price-block">
+                <div class="price-tag">Price</div>
+                <div class="price-row">
+                    <div class="price-main"><small>₹</small>{{ pesticide.price|floatformat:0 }}</div>
+                </div>
+                <div class="delivery-note">
+                    <i class="fas fa-truck"></i> Free delivery on orders above ₹1500
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'marketplace:add_pesticide_to_cart' pesticide.id %}">
+                {% csrf_token %}
+                <div class="order-row">
+                    <div class="qty-wrap">
+                        <button type="button" class="qty-btn" onclick="adj(-1)"><i class="fas fa-minus" style="font-size:10px"></i></button>
+                        <input type="number" name="quantity" id="qty" class="qty-inp" value="1" min="1" max="99">
+                        <button type="button" class="qty-btn" onclick="adj(1)"><i class="fas fa-plus" style="font-size:10px"></i></button>
+                    </div>
+                    <button type="submit" class="add-to-cart">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                    <button type="button" class="wishlist-btn" onclick="this.style.color='#f43f5e'"><i class="fas fa-heart"></i></button>
+                </div>
+            </form>
+
+            <div class="safe-badge">
+                <i class="fas fa-shield-check"></i>
+                Safe to use — follow label instructions. Store in a cool, dry place.
             </div>
         </div>
     </div>
+
+    <!-- INFO TABS -->
+    <div class="tabs">
+        <button class="tab-btn on" onclick="showTab(0,this)">Details</button>
+        <button class="tab-btn" onclick="showTab(1,this)">Usage Guide</button>
+        <button class="tab-btn" onclick="showTab(2,this)">Safety</button>
+    </div>
+
+    <div id="tc0" class="tab-content show">
+        <p>{{ pesticide.description }}</p>
+        <br>
+        <p>This product is sourced directly from certified agricultural manufacturers and meets all government safety standards for crop protection use in India. The formulation is designed for effective pest control while minimizing harm to beneficial insects when used as directed.</p>
+    </div>
+    <div id="tc1" class="tab-content">
+        <p><strong style="color:var(--text)">Mixing:</strong> Dissolve the recommended amount in clean water before spraying. Read the label for exact ratios based on your crop type and pest severity.</p>
+        <br>
+        <p><strong style="color:var(--text)">Application:</strong> Apply in the early morning or evening to avoid evaporation and direct sunlight. Ensure uniform coverage on all plant surfaces including the underside of leaves.</p>
+        <br>
+        <p><strong style="color:var(--text)">Frequency:</strong> Repeat treatment as directed — typically every 7–14 days depending on severity. Do not exceed the recommended number of applications per season.</p>
+    </div>
+    <div id="tc2" class="tab-content">
+        <p><strong style="color:var(--text)">Personal Protection:</strong> Always wear gloves, eye protection and a mask when handling. Avoid inhaling spray mist. Wash hands thoroughly after use.</p>
+        <br>
+        <p><strong style="color:var(--text)">Storage:</strong> Keep in original container, tightly sealed, away from direct sunlight. Store out of reach of children and pets. Do not store near food, feed or water sources.</p>
+        <br>
+        <p><strong style="color:var(--text)">Disposal:</strong> Do not pour unused product into drains or water bodies. Contact your local agricultural office for proper disposal methods.</p>
+    </div>
+
+</main>
+
+<script>
+function adj(d){
+    const q=document.getElementById('qty');
+    const v=Math.min(99,Math.max(1,parseInt(q.value||1)+d));
+    q.value=v;
+}
+function showTab(i,btn){
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('show'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+    document.getElementById('tc'+i).classList.add('show');
+    btn.classList.add('on');
+}
+</script>
 </body>
 </html>
