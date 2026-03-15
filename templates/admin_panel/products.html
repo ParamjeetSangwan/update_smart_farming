@@ -1,0 +1,167 @@
+{% extends "base_admin.html" %}
+{% block title %}Products — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Product Management{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+        <h1 class="page-title">Product Management</h1>
+        <p class="page-subtitle">Manage tools and pesticides in the marketplace</p>
+    </div>
+    <a href="{% url 'admin_product_add' %}" style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:var(--green-bright);color:white;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;">
+        <i class="fas fa-plus"></i> Add Product
+    </a>
+</div>
+
+<!-- Stats -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px;">
+    <div class="stat-card green" style="padding:16px;">
+        <div class="stat-value" style="font-size:24px;">{{ total_tools }}</div>
+        <div class="stat-label">Total Tools</div>
+    </div>
+    <div class="stat-card gold" style="padding:16px;">
+        <div class="stat-value" style="font-size:24px;">{{ total_pesticides }}</div>
+        <div class="stat-label">Total Pesticides</div>
+    </div>
+</div>
+
+<!-- Search & Filter -->
+<div class="table-card" style="margin-bottom:20px;padding:18px 24px;">
+    <form method="GET" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <div style="flex:1;min-width:200px;position:relative;">
+            <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:13px;"></i>
+            <input type="text" name="q" value="{{ search }}" placeholder="Search products..."
+                style="width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+        </div>
+        <select name="type" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;color:var(--gray-800);">
+            <option value="">All Types</option>
+            <option value="tools" {% if product_type == 'tools' %}selected{% endif %}>Tools Only</option>
+            <option value="pesticides" {% if product_type == 'pesticides' %}selected{% endif %}>Pesticides Only</option>
+        </select>
+        <button type="submit" style="padding:9px 20px;background:var(--green-bright);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
+            <i class="fas fa-search"></i> Search
+        </button>
+        {% if search or product_type %}
+        <a href="{% url 'admin_products' %}" style="padding:9px 16px;background:var(--gray-100);color:var(--gray-600);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">
+            <i class="fas fa-times"></i> Clear
+        </a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Tools Table -->
+{% if tools %}
+<div class="table-card" style="margin-bottom:20px;">
+    <div class="table-header">
+        <span class="table-title">🔧 Tools <span style="font-size:12px;color:var(--gray-400);">({{ tools|length }})</span></span>
+        <a href="{% url 'admin_product_add' %}?type=tool" class="view-all-btn">+ Add Tool</a>
+    </div>
+    <div style="overflow-x:auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tool in tools %}
+            <tr>
+                <td style="color:var(--gray-400);font-size:12px;">#{{ tool.id }}</td>
+                <td>
+                    {% if tool.image %}
+                    <img src="{{ tool.image.url }}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid var(--gray-200);">
+                    {% else %}
+                    <div style="width:44px;height:44px;border-radius:8px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;color:var(--green-bright);font-size:18px;">🔧</div>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="font-weight:600;font-size:13.5px;">{{ tool.name }}</div>
+                    <div style="font-size:11px;color:var(--gray-400);">{{ tool.description|truncatechars:50 }}</div>
+                </td>
+                <td><span class="status-badge processing">{{ tool.category }}</span></td>
+                <td style="font-weight:700;color:var(--green-bright);">₹{{ tool.price }}</td>
+                <td>
+                    <div style="display:flex;gap:6px;">
+                        <a href="{% url 'admin_tool_edit' tool.id %}" style="width:30px;height:30px;border-radius:7px;background:rgba(59,130,246,0.1);color:var(--accent-blue);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:12px;">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form method="POST" action="{% url 'admin_tool_delete' tool.id %}" onsubmit="return confirm('Delete {{ tool.name }}?')">
+                            {% csrf_token %}
+                            <button type="submit" style="width:30px;height:30px;border-radius:7px;background:rgba(255,71,87,0.1);color:var(--accent-red);border:none;cursor:pointer;font-size:12px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--gray-400);">No tools found</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Pesticides Table -->
+{% if pesticides %}
+<div class="table-card">
+    <div class="table-header">
+        <span class="table-title">🧪 Pesticides <span style="font-size:12px;color:var(--gray-400);">({{ pesticides|length }})</span></span>
+        <a href="{% url 'admin_product_add' %}?type=pesticide" class="view-all-btn">+ Add Pesticide</a>
+    </div>
+    <div style="overflow-x:auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pesticide in pesticides %}
+            <tr>
+                <td style="color:var(--gray-400);font-size:12px;">#{{ pesticide.id }}</td>
+                <td>
+                    {% if pesticide.image %}
+                    <img src="{{ pesticide.image.url }}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid var(--gray-200);">
+                    {% else %}
+                    <div style="width:44px;height:44px;border-radius:8px;background:rgba(255,125,59,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🧪</div>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="font-weight:600;font-size:13.5px;">{{ pesticide.name }}</div>
+                    <div style="font-size:11px;color:var(--gray-400);">{{ pesticide.description|truncatechars:50 }}</div>
+                </td>
+                <td style="font-weight:700;color:var(--green-bright);">₹{{ pesticide.price }}</td>
+                <td>
+                    <div style="display:flex;gap:6px;">
+                        <a href="{% url 'admin_pesticide_edit' pesticide.id %}" style="width:30px;height:30px;border-radius:7px;background:rgba(59,130,246,0.1);color:var(--accent-blue);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:12px;">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form method="POST" action="{% url 'admin_pesticide_delete' pesticide.id %}" onsubmit="return confirm('Delete {{ pesticide.name }}?')">
+                            {% csrf_token %}
+                            <button type="submit" style="width:30px;height:30px;border-radius:7px;background:rgba(255,71,87,0.1);color:var(--accent-red);border:none;cursor:pointer;font-size:12px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--gray-400);">No pesticides found</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

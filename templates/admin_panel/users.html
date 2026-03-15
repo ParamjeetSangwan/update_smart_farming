@@ -1,0 +1,162 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Users — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}User Management{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+        <h1 class="page-title">User Management</h1>
+        <p class="page-subtitle">Manage all registered farmers on SmartFarm</p>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px;">
+    <div class="stat-card green" style="padding:16px;">
+        <div class="stat-value" style="font-size:24px;">{{ total }}</div>
+        <div class="stat-label">Total Users</div>
+    </div>
+    <div class="stat-card blue" style="padding:16px;">
+        <div class="stat-value" style="font-size:24px;">{{ active_count }}</div>
+        <div class="stat-label">Active Users</div>
+    </div>
+    <div class="stat-card gold" style="padding:16px;">
+        <div class="stat-value" style="font-size:24px;">{{ staff_count }}</div>
+        <div class="stat-label">Admin Users</div>
+    </div>
+</div>
+
+<!-- Search & Filter -->
+<div class="table-card" style="margin-bottom:20px;padding:18px 24px;">
+    <form method="GET" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <div style="flex:1;min-width:200px;position:relative;">
+            <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:13px;"></i>
+            <input type="text" name="q" value="{{ search }}" placeholder="Search by username or email..."
+                style="width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border 0.2s;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+        </div>
+        <select name="status" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;color:var(--gray-800);">
+            <option value="">All Status</option>
+            <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+            <option value="staff" {% if status == 'staff' %}selected{% endif %}>Admin/Staff</option>
+        </select>
+        <button type="submit" style="padding:9px 20px;background:var(--green-bright);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
+            <i class="fas fa-search"></i> Search
+        </button>
+        {% if search or status %}
+        <a href="{% url 'admin_users' %}" style="padding:9px 16px;background:var(--gray-100);color:var(--gray-600);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">
+            <i class="fas fa-times"></i> Clear
+        </a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Users Table -->
+<div class="table-card">
+    <div class="table-header">
+        <span class="table-title">All Users <span style="font-size:12px;font-weight:500;color:var(--gray-400);">({{ total }} found)</span></span>
+    </div>
+    <div style="overflow-x:auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>#ID</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Location</th>
+                <th>Orders</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td style="color:var(--gray-400);font-size:12px;">#{{ user.id }}</td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--green-bright),var(--green-light));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px;flex-shrink:0;">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div>
+                            <div style="font-weight:600;font-size:13.5px;">{{ user.username }}</div>
+                            <div style="font-size:11px;color:var(--gray-400);">{{ user.first_name }} {{ user.last_name }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="font-size:13px;">{{ user.email|default:"—" }}</td>
+                <td style="font-size:13px;">
+                    {% if user.profile %}{{ user.profile.location|default:"—" }}{% else %}—{% endif %}
+                </td>
+                <td>
+                    <span style="font-weight:600;color:var(--green-bright);">{{ user.order_count }}</span>
+                </td>
+                <td style="font-size:12px;color:var(--gray-400);">{{ user.date_joined|date:"M d, Y" }}</td>
+                <td>
+                    <span class="status-badge {% if user.is_active %}delivered{% else %}cancelled{% endif %}">
+                        {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                </td>
+                <td>
+                    {% if user.is_superuser %}
+                    <span class="status-badge processing">Superadmin</span>
+                    {% elif user.is_staff %}
+                    <span class="status-badge shipped">Staff</span>
+                    {% else %}
+                    <span class="status-badge pending">User</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display:flex;gap:6px;">
+                        <a href="{% url 'admin_user_detail' user.id %}" title="View Details"
+                            style="width:30px;height:30px;border-radius:7px;background:rgba(59,130,246,0.1);color:var(--accent-blue);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:12px;transition:all 0.2s;">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <form method="POST" action="{% url 'admin_user_toggle' user.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" title="{% if user.is_active %}Deactivate{% else %}Activate{% endif %}"
+                                style="width:30px;height:30px;border-radius:7px;background:rgba(240,192,64,0.12);color:var(--accent-gold);border:none;cursor:pointer;font-size:12px;transition:all 0.2s;">
+                                <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %}"></i>
+                            </button>
+                        </form>
+                        {% if not user.is_superuser %}
+                        <form method="POST" action="{% url 'admin_user_staff' user.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" title="Toggle Staff"
+                                style="width:30px;height:30px;border-radius:7px;background:rgba(37,162,68,0.1);color:var(--green-bright);border:none;cursor:pointer;font-size:12px;transition:all 0.2s;">
+                                <i class="fas fa-user-shield"></i>
+                            </button>
+                        </form>
+                        <form method="POST" action="{% url 'admin_user_delete' user.id %}" style="display:inline;"
+                            onsubmit="return confirm('Delete user {{ user.username }}? This cannot be undone!')">
+                            {% csrf_token %}
+                            <button type="submit" title="Delete"
+                                style="width:30px;height:30px;border-radius:7px;background:rgba(255,71,87,0.1);color:var(--accent-red);border:none;cursor:pointer;font-size:12px;transition:all 0.2s;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray-400);">
+                <i class="fas fa-users" style="font-size:32px;margin-bottom:10px;display:block;opacity:0.3;"></i>
+                No users found
+            </td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<!-- Messages -->
+{% for message in messages %}
+<div style="position:fixed;bottom:24px;right:24px;background:var(--green-deep);color:white;padding:14px 20px;border-radius:12px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);border-left:4px solid var(--green-bright);z-index:999;animation:slideIn 0.3s ease;">
+    <i class="fas fa-check-circle"></i> {{ message }}
+</div>
+{% endfor %}
+{% endblock %}

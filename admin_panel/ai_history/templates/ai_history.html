@@ -1,0 +1,55 @@
+<!-- ai_history.html -->
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="ai-history">
+    <h1>AI Chat History</h1>
+    <form method="get" class="search-filter-form">
+        <input type="text" name="search" placeholder="Search prompt/response" value="{{ search }}">
+        <input type="text" name="user" placeholder="User" value="{{ filter_user }}">
+        <input type="date" name="date" value="{{ filter_date }}">
+        <button type="submit">Filter</button>
+    </form>
+    <table class="ai-query-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Prompt</th>
+                <th>Response</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for query in page_obj %}
+                <tr>
+                    <td>{{ query.user.username }}</td>
+                    <td>{{ query.prompt|truncatechars:40 }}</td>
+                    <td>{{ query.response|truncatechars:40 }}</td>
+                    <td>{{ query.timestamp }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+    <div class="ai-analytics">
+        <h2>AI Query Analytics</h2>
+        <ul>
+            <li>Total Queries: {{ total_queries }}</li>
+        </ul>
+        <h3>Queries by User</h3>
+        <ul>
+            {% for user in queries_by_user %}
+                <li>{{ user.user__username }}: {{ user.count }}</li>
+            {% endfor %}
+        </ul>
+        <!-- Add more analytics as needed -->
+    </div>
+</div>
+{% endblock %}

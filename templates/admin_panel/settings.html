@@ -1,0 +1,34 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Settings — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Settings{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Settings</h1>
+    <p class="page-subtitle">System configuration and preferences</p>
+</div>
+<div class="chart-card" style="max-width:600px;">
+    <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="padding:16px;background:var(--green-pale);border-radius:10px;border-left:4px solid var(--green-bright);">
+            <div style="font-weight:700;font-size:14px;color:var(--green-deep);margin-bottom:4px;">🌾 SmartFarm Admin Panel</div>
+            <div style="font-size:13px;color:var(--gray-600);">Version 1.0 — Django {{ django_version|default:"5.x" }}</div>
+        </div>
+        <div>
+            <div style="font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:10px;">Quick Links</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                <a href="/admin/" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--gray-50);border-radius:8px;text-decoration:none;color:var(--gray-800);font-size:13px;font-weight:500;border:1px solid var(--gray-200);transition:all 0.2s;">
+                    <i class="fas fa-shield-alt" style="color:var(--green-bright);width:16px;"></i> Django Admin Panel
+                </a>
+                <a href="{% url 'admin_users' %}" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--gray-50);border-radius:8px;text-decoration:none;color:var(--gray-800);font-size:13px;font-weight:500;border:1px solid var(--gray-200);transition:all 0.2s;">
+                    <i class="fas fa-users" style="color:var(--accent-blue);width:16px;"></i> Manage Users
+                </a>
+                <a href="{% url 'admin_products' %}" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--gray-50);border-radius:8px;text-decoration:none;color:var(--gray-800);font-size:13px;font-weight:500;border:1px solid var(--gray-200);transition:all 0.2s;">
+                    <i class="fas fa-box-open" style="color:var(--accent-gold);width:16px;"></i> Manage Products
+                </a>
+                <a href="{% url 'admin_reports' %}" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--gray-50);border-radius:8px;text-decoration:none;color:var(--gray-800);font-size:13px;font-weight:500;border:1px solid var(--gray-200);transition:all 0.2s;">
+                    <i class="fas fa-chart-bar" style="color:var(--accent-orange);width:16px;"></i> View Reports
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

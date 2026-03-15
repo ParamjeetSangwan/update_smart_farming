@@ -1,0 +1,194 @@
+{% extends "base_admin.html" %}
+{% block title %}Crops — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Crop Management{% endblock %}
+
+{% block content %}
+<style>
+    /* Dark mode fixes for crops page */
+    body.dark .filter-input,
+    body.dark .filter-select {
+        background: #0a1c10 !important;
+        border-color: rgba(255,255,255,0.1) !important;
+        color: #e0ede6 !important;
+    }
+    body.dark .clear-btn {
+        background: rgba(255,255,255,0.07) !important;
+        color: #c0d8c8 !important;
+    }
+    body.dark .page-btn {
+        background: #111f15;
+        border-color: rgba(255,255,255,0.08);
+        color: #c0d8c8;
+    }
+    body.dark .page-btn:hover { background: #0a1c10; }
+    body.dark .page-btn.active {
+        background: var(--green-bright) !important;
+        color: white !important;
+    }
+</style>
+
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+        <h1 class="page-title">Crop Database</h1>
+        <p class="page-subtitle">{{ total }} total crops in database</p>
+    </div>
+    <a href="{% url 'admin_crop_add' %}" style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:var(--green-bright);color:white;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;">
+        <i class="fas fa-plus"></i> Add Crop
+    </a>
+</div>
+
+<!-- Search & Filter -->
+<div class="table-card" style="margin-bottom:20px;padding:18px 24px;">
+    <form method="GET" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <div style="flex:1;min-width:180px;position:relative;">
+            <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:13px;"></i>
+            <input type="text" name="q" value="{{ search }}" placeholder="Search crop or country..."
+                class="filter-input"
+                style="width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+        </div>
+        <select name="country" class="filter-select"
+            style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;color:var(--gray-800);">
+            <option value="">All Countries</option>
+            {% for c in countries %}
+            <option value="{{ c }}" {% if country_filter == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+        <select name="season" class="filter-select"
+            style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;color:var(--gray-800);">
+            <option value="">All Seasons</option>
+            {% for s in seasons %}
+            <option value="{{ s }}" {% if season_filter == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="padding:9px 20px;background:var(--green-bright);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+            <i class="fas fa-filter"></i> Filter
+        </button>
+        {% if search or country_filter or season_filter %}
+        <a href="{% url 'admin_crops' %}" class="clear-btn"
+            style="padding:9px 16px;background:var(--gray-100);color:var(--gray-600);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">
+            <i class="fas fa-times"></i> Clear
+        </a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Crops Table -->
+<div class="table-card">
+    <div class="table-header">
+        <span class="table-title">
+            Crops
+            <span style="font-size:12px;color:var(--gray-400);">
+                ({{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }})
+            </span>
+        </span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Crop</th>
+                    <th>Country</th>
+                    <th>Soil Type</th>
+                    <th>Temperature</th>
+                    <th>Season</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for crop in page_obj %}
+                <tr>
+                    <td style="color:var(--gray-400);font-size:12px;">{{ forloop.counter0|add:page_obj.start_index }}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:18px;">🌾</span>
+                            <strong style="font-size:13.5px;">{{ crop.crop }}</strong>
+                        </div>
+                    </td>
+                    <td style="font-size:13px;">🌍 {{ crop.country }}</td>
+                    <td style="font-size:13px;">{{ crop.soil_type }}</td>
+                    <td style="font-size:13px;">🌡️ {{ crop.temperature }}</td>
+                    <td><span class="status-badge delivered">{{ crop.season }}</span></td>
+                    <td><span class="status-badge processing">{{ crop.category }}</span></td>
+                    <td>
+                        <div style="display:flex;gap:6px;">
+                            <a href="{% url 'admin_crop_edit' crop.id %}"
+                                style="width:30px;height:30px;border-radius:7px;background:rgba(59,130,246,0.1);color:var(--accent-blue);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:12px;">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="POST" action="{% url 'admin_crop_delete' crop.id %}"
+                                onsubmit="return confirm('Delete crop {{ crop.crop }}?')">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    style="width:30px;height:30px;border-radius:7px;background:rgba(255,71,87,0.1);color:var(--accent-red);border:none;cursor:pointer;font-size:12px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align:center;padding:40px;color:var(--gray-400);">
+                        <i class="fas fa-seedling" style="font-size:32px;margin-bottom:10px;display:block;opacity:0.3;"></i>
+                        No crops found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINATION -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div style="padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--gray-100);flex-wrap:wrap;gap:12px;">
+        <div style="font-size:13px;color:var(--gray-400);">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if search %}&q={{ search }}{% endif %}{% if country_filter %}&country={{ country_filter }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}"
+                class="page-btn"
+                style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;color:var(--gray-600);background:white;">
+                «
+            </a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if search %}&q={{ search }}{% endif %}{% if country_filter %}&country={{ country_filter }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}"
+                class="page-btn"
+                style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;color:var(--gray-600);background:white;">
+                ‹ Prev
+            </a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                <span class="page-btn active"
+                    style="padding:6px 12px;border:1px solid var(--green-bright);border-radius:7px;font-size:12px;font-weight:600;background:var(--green-bright);color:white;">
+                    {{ num }}
+                </span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}{% if search %}&q={{ search }}{% endif %}{% if country_filter %}&country={{ country_filter }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}"
+                    class="page-btn"
+                    style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;color:var(--gray-600);background:white;">
+                    {{ num }}
+                </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search %}&q={{ search }}{% endif %}{% if country_filter %}&country={{ country_filter }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}"
+                class="page-btn"
+                style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;color:var(--gray-600);background:white;">
+                Next ›
+            </a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if search %}&q={{ search }}{% endif %}{% if country_filter %}&country={{ country_filter }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}"
+                class="page-btn"
+                style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;color:var(--gray-600);background:white;">
+                »
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

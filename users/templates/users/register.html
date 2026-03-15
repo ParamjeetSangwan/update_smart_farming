@@ -3,122 +3,467 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Farming | Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-image: url("{% static 'images/background.jpg' %}");
-            background-size: cover;
-            background-position: center;
-            height: 100vh;
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
             display: flex;
+            background: #0a2e1a;
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5c35 50%, #0f3d22 100%);
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .register-box {
-            background: rgba(255, 255, 255, 0.96);
-            padding: 45px 35px;
-            border-radius: 16px;
-            width: 380px;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: rgba(37,162,68,0.12);
+            border-radius: 50%;
+            top: -100px; left: -100px;
         }
 
-        .register-box h1 {
-            margin-bottom: 8px;
-            text-align: center;
-            color: #009a72;
-            font-size: 26px;
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            background: rgba(37,162,68,0.08);
+            border-radius: 50%;
+            bottom: -80px; right: -80px;
         }
 
-        .register-box h2 {
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 22px;
-            color: #333;
-        }
+        .brand { text-align: center; z-index: 1; }
 
-        .register-box label {
-            font-weight: 600;
-        }
-
-        .register-box input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 8px;
+        .brand-icon {
+            font-size: 64px;
             margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
+            display: block;
+            filter: drop-shadow(0 4px 20px rgba(37,162,68,0.5));
+            animation: float 3s ease-in-out infinite;
         }
 
-        .register-box button {
-            width: 100%;
-            padding: 10px;
-            background-color: #00c896;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
             color: white;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
+            margin-bottom: 10px;
         }
 
-        .register-box button:hover {
-            background-color: #00a77d;
+        .brand-tagline {
+            font-size: 15px;
+            color: rgba(255,255,255,0.6);
+            max-width: 280px;
+            line-height: 1.6;
         }
 
-        .error-message {
-            color: red;
-            text-align: center;
-            margin-bottom: 12px;
+        .steps {
+            margin-top: 50px;
+            z-index: 1;
+            width: 100%;
+            max-width: 300px;
         }
 
-        .bottom-links {
-            margin-top: 18px;
-            text-align: center;
+        .steps-title {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 16px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .step-num {
+            width: 28px; height: 28px;
+            background: rgba(37,162,68,0.25);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #4cca6e;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.65);
+        }
+
+        /* RIGHT PANEL */
+        .right-panel {
+            width: 500px;
+            background: #f8faf9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 50px;
+            overflow-y: auto;
+        }
+
+        .form-header { margin-bottom: 30px; }
+
+        .form-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: #0a2e1a;
+            margin-bottom: 6px;
+        }
+
+        .form-subtitle { font-size: 14px; color: #8fa99a; }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e2e28;
+            margin-bottom: 7px;
+        }
+
+        .input-wrap { position: relative; }
+
+        .input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8fa99a;
             font-size: 14px;
         }
 
-        .bottom-links a {
-            color: #00a77d;
+        .form-group input {
+            width: 100%;
+            padding: 11px 14px 11px 40px;
+            border: 1.5px solid #d8e2dc;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            background: white;
+            color: #1e2e28;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #25a244;
+            box-shadow: 0 0 0 3px rgba(37,162,68,0.1);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8fa99a;
+            font-size: 14px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* Password strength */
+        .password-strength {
+            margin-top: 6px;
+            display: none;
+        }
+
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: #d8e2dc;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: all 0.3s;
+            width: 0;
+        }
+
+        .strength-text { font-size: 11px; color: #8fa99a; }
+
+        /* Terms */
+        .terms-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 22px;
+            font-size: 13px;
+            color: #4a6358;
+        }
+
+        .terms-check input[type="checkbox"] {
+            width: 16px; height: 16px;
+            accent-color: #25a244;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .terms-check a { color: #25a244; text-decoration: none; font-weight: 600; }
+
+        .btn-register {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #25a244, #4cca6e);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(37,162,68,0.35);
+        }
+
+        .btn-register:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37,162,68,0.4);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: ''; flex: 1;
+            height: 1px; background: #d8e2dc;
+        }
+
+        .divider span { font-size: 12px; color: #8fa99a; font-weight: 500; }
+
+        .bottom-link {
+            text-align: center;
+            font-size: 14px;
+            color: #4a6358;
+        }
+
+        .bottom-link a {
+            color: #25a244;
+            font-weight: 600;
             text-decoration: none;
         }
 
-        .bottom-links a:hover {
-            text-decoration: underline;
+        .bottom-link a:hover { text-decoration: underline; }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-error { background: rgba(255,71,87,0.08); color: #c0392b; border: 1px solid rgba(255,71,87,0.2); }
+        .alert-success { background: rgba(37,162,68,0.08); color: #1a7a35; border: 1px solid rgba(37,162,68,0.2); }
+
+        @media (max-width: 768px) {
+            .left-panel { display: none; }
+            .right-panel { width: 100%; padding: 40px 24px; }
+            .form-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="register-box">
-        <h1>🌾 Smart Farming</h1>
-        <h2>Create an Account</h2>
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <div class="brand">
+            <span class="brand-icon">🌾</span>
+            <div class="brand-name">SmartFarming</div>
+            <div class="brand-tagline">Join thousands of farmers making smarter decisions with technology</div>
+        </div>
+        <div class="steps">
+            <div class="steps-title">How it works</div>
+            <div class="step-item">
+                <div class="step-num">1</div>
+                <div class="step-text">Create your free account</div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">2</div>
+                <div class="step-text">Set up your farm profile</div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">3</div>
+                <div class="step-text">Get AI crop recommendations</div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">4</div>
+                <div class="step-text">Shop tools & pesticides</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <div class="form-header">
+            <div class="form-title">Create Account 🌱</div>
+            <div class="form-subtitle">Join SmartFarming — it's completely free</div>
+        </div>
 
         {% if messages %}
             {% for message in messages %}
-                <div class="error-message">{{ message }}</div>
+            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+                {{ message }}
+            </div>
             {% endfor %}
         {% endif %}
 
-        <form method="post">
+        <form method="POST" id="registerForm">
             {% csrf_token %}
-            <label>Username:</label>
-            <input type="text" name="username" required>
 
-            <label>Email:</label>
-            <input type="email" name="email" required>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Username *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="username" placeholder="Choose username" required autofocus>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="your@email.com" required>
+                    </div>
+                </div>
+            </div>
 
-            <label>Password:</label>
-            <input type="password" name="password" required>
+            <div class="form-group">
+                <label>Password *</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" id="passInput" placeholder="Create a strong password" required oninput="checkStrength(this.value)">
+                    <button type="button" class="toggle-password" onclick="togglePass('passInput', 'eyeIcon1')">
+                        <i class="fas fa-eye" id="eyeIcon1"></i>
+                    </button>
+                </div>
+                <div class="password-strength" id="strengthBox">
+                    <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                    <div class="strength-text" id="strengthText">Enter a password</div>
+                </div>
+            </div>
 
-            <button type="submit">Register</button>
+            <div class="form-group">
+                <label>Confirm Password *</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="confirm_password" id="confirmInput" placeholder="Repeat your password" required>
+                    <button type="button" class="toggle-password" onclick="togglePass('confirmInput', 'eyeIcon2')">
+                        <i class="fas fa-eye" id="eyeIcon2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="terms-check">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+            </div>
+
+            <button type="submit" class="btn-register">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
         </form>
 
-        <div class="bottom-links">
-            <p>Already have an account? <a href="{% url 'login' %}">Go back to Login</a></p>
+        <div class="divider"><span>Already registered?</span></div>
+
+        <div class="bottom-link">
+            <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
         </div>
     </div>
+
+<script>
+function togglePass(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+function checkStrength(val) {
+    const box = document.getElementById('strengthBox');
+    const fill = document.getElementById('strengthFill');
+    const text = document.getElementById('strengthText');
+    box.style.display = 'block';
+
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+        { width: '25%', color: '#ff4757', label: 'Weak' },
+        { width: '50%', color: '#ff7d3b', label: 'Fair' },
+        { width: '75%', color: '#f0c040', label: 'Good' },
+        { width: '100%', color: '#25a244', label: 'Strong' },
+    ];
+
+    const level = levels[Math.max(score - 1, 0)];
+    fill.style.width = level.width;
+    fill.style.background = level.color;
+    text.textContent = level.label;
+    text.style.color = level.color;
+}
+
+// Confirm password validation
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const pass = document.getElementById('passInput').value;
+    const confirm = document.getElementById('confirmInput').value;
+    if (pass !== confirm) {
+        e.preventDefault();
+        alert('Passwords do not match!');
+    }
+});
+</script>
 </body>
 </html>

@@ -1,0 +1,50 @@
+<!-- user_report.html -->
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="user-report">
+    <h1>User Report</h1>
+    <button type="button" onclick="window.print()">Print</button>
+    <!-- Export buttons (CSV, Excel) can be added here -->
+    <h2>User Growth</h2>
+    <ul>
+        {% for month in user_growth %}
+            <li>{{ month.month }}: {{ month.count }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Most Active Users</h2>
+    <table class="user-activity-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Orders</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in user_activity %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.orders.count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Top Customers</h2>
+    <table class="top-customers-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Total Spent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in top_customers %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>₹{{ user.orders.all|aggregate:'sum:total_price' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Add retention and more analytics as needed -->
+</div>
+{% endblock %}

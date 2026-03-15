@@ -1,88 +1,315 @@
-{% extends "base.html" %}
 {% load static %}
 {% load marketplace_filters %}
-{% block content %}
-<style>
-    body {
-        background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed;
-        background-size: cover;
-    }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarming | My Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-<div class="container mt-4">
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5c35 60%, #0f3d22 100%);
+            color: white;
+        }
 
-    <!-- Back to Dashboard Button -->
-    <a href="{% url 'dashboard' %}" class="btn btn-secondary mb-3">
-        ← Back to Dashboard
-    </a>
+        .topbar {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 0 32px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+        }
 
-    <h2 class="mb-4">My Orders</h2>
+        .topbar-brand { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
 
-    {% if orders %}
-        <!-- Clear Orders Button -->
-        <form method="post" action="{% url 'marketplace:clear_orders' %}" class="mb-3">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger"
-                    onclick="return confirm('Are you sure you want to clear all your previous orders?');">
-                Clear All Orders
-            </button>
-        </form>
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
 
-        {% for order in orders %}
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <strong>Order #{{ order.id }}</strong> - {{ order.created_at|date:"Y-m-d" }}
-                <span class="float-end">Total: ₹{{ order.total_price }}</span>
-            </div>
-            <div class="card-body">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Product</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Qty</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in order.items.all %}
-                        <tr>
-                            <td>
-                                {% if item.product %}
-                                    <div class="d-flex align-items-center">
-                                        {% if item.product.image %}
-                                            <img src="{{ item.product.image.url }}" alt="{{ item.name }}" 
-                                                 class="img-thumbnail me-2" style="width: 60px; height: 60px; object-fit: cover;">
-                                        {% else %}
-                                            <div class="bg-light border d-flex align-items-center justify-content-center me-2"
-                                                 style="width: 60px; height: 60px;">
-                                                <small class="text-muted">No Image</small>
-                                            </div>
-                                        {% endif %}
-                                        <span>{{ item.product.name }}</span>
-                                    </div>
-                                {% else %}
-                                    {{ item.name }} <small class="text-muted">(Deleted)</small>
-                                {% endif %}
-                            </td>
-                            <td>{{ item.item_type|title }}</td>
-                            <td>₹{{ item.price }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>
-                                ₹
-                                {# use mul filter to multiply price * quantity and format to 2 decimals #}
-                                {{ item.price|mul:item.quantity|floatformat:2 }}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        .back-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px; background: rgba(255,255,255,0.1);
+            color: white; border-radius: 8px; text-decoration: none;
+            font-size: 13px; font-weight: 600; transition: all 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.18); }
+
+        .clear-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 14px;
+            background: rgba(255,71,87,0.12);
+            border: 1px solid rgba(255,71,87,0.2);
+            color: #ff6b7a; border-radius: 8px;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+        }
+        .clear-btn:hover { background: rgba(255,71,87,0.2); }
+
+        .main { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+        /* PAGE HEADER */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            animation: fadeUp 0.5s ease;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .page-title-wrap .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .page-title-wrap .page-subtitle { font-size: 14px; color: rgba(255,255,255,0.45); }
+
+        /* ORDER CARDS */
+        .orders-list { display: flex; flex-direction: column; gap: 20px; }
+
+        .order-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.2s;
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .order-card:hover {
+            border-color: rgba(37,162,68,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        /* ORDER HEADER */
+        .order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .order-header-left { display: flex; align-items: center; gap: 14px; }
+
+        .order-icon {
+            width: 42px; height: 42px;
+            background: rgba(37,162,68,0.15);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+
+        .order-id {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .order-date { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+        .order-total {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: #4cca6e;
+        }
+
+        /* ORDER ITEMS */
+        .order-items { padding: 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.2s;
+        }
+
+        .order-item:hover { background: rgba(255,255,255,0.08); }
+
+        .item-img {
+            width: 52px; height: 52px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .item-placeholder {
+            width: 52px; height: 52px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .item-info { flex: 1; min-width: 0; }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .item-type {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: rgba(37,162,68,0.15);
+            color: #4cca6e;
+            display: inline-block;
+        }
+
+        .item-price-wrap { text-align: right; flex-shrink: 0; }
+
+        .item-qty { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 2px; }
+
+        .item-subtotal { font-weight: 700; font-size: 15px; color: #4cca6e; }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .empty-state .emoji { font-size: 64px; display: block; margin-bottom: 16px; opacity: 0.4; }
+        .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .empty-state p { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 24px; }
+
+        .shop-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #25a244, #4cca6e);
+            color: white; border-radius: 10px; text-decoration: none;
+            font-size: 14px; font-weight: 700;
+            box-shadow: 0 4px 14px rgba(37,162,68,0.35);
+            transition: all 0.2s;
+        }
+        .shop-btn:hover { transform: translateY(-1px); }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .topbar { padding: 0 16px; }
+            .main { padding: 24px 16px; }
+            .order-header { padding: 14px 16px; }
+            .order-items { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="topbar-brand">🌾 SmartFarming</div>
+        <div class="topbar-right">
+            {% if orders %}
+            <form method="POST" action="{% url 'marketplace:clear_orders' %}" onsubmit="return confirm('Clear all orders?')">
+                {% csrf_token %}
+                <button type="submit" class="clear-btn">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+            </form>
+            {% endif %}
+            <a href="{% url 'dashboard' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
         </div>
-        {% endfor %}
-    {% else %}
-        <div class="alert alert-info">You have not placed any orders yet.</div>
-    {% endif %}
-</div>
-{% endblock %}
+    </header>
+
+    <main class="main">
+
+        <div class="page-header">
+            <div class="page-title-wrap">
+                <div class="page-title">📦 My Orders</div>
+                <div class="page-subtitle">
+                    {% if orders %}{{ orders|length }} order(s) placed{% else %}No orders yet{% endif %}
+                </div>
+            </div>
+            <a href="{% url 'marketplace:marketplace_home' %}" class="back-btn">
+                <i class="fas fa-store"></i> Go Shopping
+            </a>
+        </div>
+
+        {% if orders %}
+        <div class="orders-list">
+            {% for order in orders %}
+            <div class="order-card" style="animation-delay: {{ forloop.counter0 }}00ms">
+                <!-- ORDER HEADER -->
+                <div class="order-header">
+                    <div class="order-header-left">
+                        <div class="order-icon">📦</div>
+                        <div>
+                            <div class="order-id">Order #{{ order.id }}</div>
+                            <div class="order-date">{{ order.created_at|date:"F d, Y" }} at {{ order.created_at|time:"H:i" }}</div>
+                        </div>
+                    </div>
+                    <div class="order-total">₹{{ order.total_price }}</div>
+                </div>
+
+                <!-- ORDER ITEMS -->
+                <div class="order-items">
+                    {% for item in order.items.all %}
+                    <div class="order-item">
+                        {% if item.product and item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.name }}" class="item-img">
+                        {% else %}
+                        <div class="item-placeholder">
+                            {% if item.item_type == 'tool' %}🔧{% else %}🧪{% endif %}
+                        </div>
+                        {% endif %}
+
+                        <div class="item-info">
+                            <div class="item-name">
+                                {% if item.product %}{{ item.product.name }}{% else %}{{ item.name }} <span style="color:rgba(255,255,255,0.3);font-size:11px;">(deleted)</span>{% endif %}
+                            </div>
+                            <span class="item-type">{{ item.item_type|title }}</span>
+                        </div>
+
+                        <div class="item-price-wrap">
+                            <div class="item-qty">× {{ item.quantity }}</div>
+                            <div class="item-subtotal">₹{{ item.price|mul:item.quantity|floatformat:2 }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <span class="emoji">📦</span>
+            <h3>No Orders Yet</h3>
+            <p>You haven't placed any orders yet.<br>Visit the marketplace to get started!</p>
+            <a href="{% url 'marketplace:marketplace_home' %}" class="shop-btn">
+                <i class="fas fa-store"></i> Browse Marketplace
+            </a>
+        </div>
+        {% endif %}
+
+    </main>
+</body>
+</html>

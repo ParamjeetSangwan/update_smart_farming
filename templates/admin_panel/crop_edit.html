@@ -1,0 +1,63 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Edit Crop — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Crops / Edit {{ crop.crop }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Edit Crop: {{ crop.crop }}</h1>
+</div>
+<div class="chart-card" style="max-width:700px;">
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Crop Name *</label>
+                <input type="text" name="crop" value="{{ crop.crop }}" required
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Country *</label>
+                <input type="text" name="country" value="{{ crop.country }}" required
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Soil Type *</label>
+                <input type="text" name="soil_type" value="{{ crop.soil_type }}" required
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Temperature *</label>
+                <input type="text" name="temperature" value="{{ crop.temperature }}" required
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Season *</label>
+                <select name="season" required style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;color:var(--gray-800);">
+                    {% for s in "Spring,Summer,Fall,Winter,Kharif,Rabi,Zaid,Year-round"|split:"," %}
+                    <option value="{{ s }}" {% if crop.season == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Category *</label>
+                <input type="text" name="category" value="{{ crop.category }}" required
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+        </div>
+        <div style="display:flex;gap:12px;">
+            <button type="submit" style="flex:1;padding:12px;background:var(--green-bright);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <a href="{% url 'admin_crops' %}" style="flex:1;padding:12px;background:var(--gray-100);color:var(--gray-600);border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;text-align:center;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

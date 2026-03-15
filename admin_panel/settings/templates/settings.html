@@ -1,0 +1,32 @@
+<!-- settings.html -->
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="settings">
+    <h1>Admin Settings</h1>
+    <form method="post">
+        {% csrf_token %}
+        <h2>Site Settings</h2>
+        <label>Site Name: <input type="text" name="site_name" value="{{ site_settings.site_name }}"></label><br>
+        <label>Logo URL: <input type="text" name="logo_url" value="{{ site_settings.logo_url }}"></label><br>
+        <label>Contact Email: <input type="email" name="contact_email" value="{{ site_settings.contact_email }}"></label><br>
+        <label>Support Phone: <input type="text" name="support_phone" value="{{ site_settings.support_phone }}"></label><br>
+        <label>Address: <input type="text" name="address" value="{{ site_settings.address }}"></label><br>
+        <h2>Email Settings</h2>
+        <label>Order Confirmation: <input type="text" name="order_confirmation" value="{{ email_settings.order_confirmation }}"></label><br>
+        <label>Status Update: <input type="text" name="status_update" value="{{ email_settings.status_update }}"></label><br>
+        <label>Welcome Email: <input type="text" name="welcome" value="{{ email_settings.welcome }}"></label><br>
+        <h2>Payment Settings</h2>
+        <label>Gateway: <input type="text" name="gateway" value="{{ payment_settings.gateway }}"></label><br>
+        <label>Currency: <input type="text" name="currency" value="{{ payment_settings.currency }}"></label><br>
+        <label>Tax: <input type="text" name="tax" value="{{ payment_settings.tax }}"></label><br>
+        <label>Shipping Rates: <input type="text" name="shipping_rates" value="{{ payment_settings.shipping_rates }}"></label><br>
+        <h2>Notification Settings</h2>
+        <label>Email Notifications: <input type="checkbox" name="email_notifications" {% if notification_settings.email_notifications %}checked{% endif %}></label><br>
+        <label>SMS Notifications: <input type="checkbox" name="sms_notifications" {% if notification_settings.sms_notifications %}checked{% endif %}></label><br>
+        <label>Low Stock Alerts: <input type="checkbox" name="low_stock_alerts" {% if notification_settings.low_stock_alerts %}checked{% endif %}></label><br>
+        <label>New Order Alerts: <input type="checkbox" name="new_order_alerts" {% if notification_settings.new_order_alerts %}checked{% endif %}></label><br>
+        <label>New User Alerts: <input type="checkbox" name="new_user_alerts" {% if notification_settings.new_user_alerts %}checked{% endif %}></label><br>
+        <button type="submit">Save Settings</button>
+    </form>
+</div>
+{% endblock %}

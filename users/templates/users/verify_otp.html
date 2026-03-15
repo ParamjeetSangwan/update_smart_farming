@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarming | Verify Email</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5c35 50%, #0f3d22 100%);
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .card {
+            background: white; border-radius: 20px; padding: 48px 44px;
+            width: 100%; max-width: 440px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeUp 0.4s ease; text-align: center;
+        }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .icon { font-size: 52px; display: block; margin-bottom: 16px; }
+        .title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: #0a2e1a; margin-bottom: 8px; }
+        .subtitle { font-size: 14px; color: #8fa99a; margin-bottom: 8px; }
+        .email { font-size: 14px; font-weight: 600; color: #25a244; margin-bottom: 28px; }
+        .otp-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; }
+        .otp-input {
+            width: 50px; height: 56px;
+            border: 2px solid #d8e2dc; border-radius: 12px;
+            font-size: 22px; font-weight: 700; text-align: center;
+            font-family: 'Syne', sans-serif; color: #0a2e1a;
+            outline: none; transition: all 0.2s;
+        }
+        .otp-input:focus { border-color: #25a244; box-shadow: 0 0 0 3px rgba(37,162,68,0.1); }
+        .btn {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, #25a244, #4cca6e);
+            color: white; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(37,162,68,0.35);
+            margin-bottom: 16px;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .resend { font-size: 13px; color: #8fa99a; }
+        .resend a { color: #25a244; font-weight: 600; text-decoration: none; }
+        .resend a:hover { text-decoration: underline; }
+        .alert {
+            padding: 12px 16px; border-radius: 10px; font-size: 13px;
+            font-weight: 500; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .alert-error { background: rgba(255,71,87,0.08); color: #c0392b; border: 1px solid rgba(255,71,87,0.2); }
+        .alert-success { background: rgba(37,162,68,0.08); color: #1a7a35; border: 1px solid rgba(37,162,68,0.2); }
+        .timer { font-size: 13px; color: #8fa99a; margin-bottom: 16px; }
+        .timer span { color: #25a244; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <span class="icon">📧</span>
+        <div class="title">Verify Your Email</div>
+        <div class="subtitle">We sent a 6-digit code to</div>
+        <div class="email">{{ email }}</div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+            <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST" id="otpForm">
+            {% csrf_token %}
+            <div class="otp-inputs">
+                <input type="text" class="otp-input" maxlength="1" data-index="0">
+                <input type="text" class="otp-input" maxlength="1" data-index="1">
+                <input type="text" class="otp-input" maxlength="1" data-index="2">
+                <input type="text" class="otp-input" maxlength="1" data-index="3">
+                <input type="text" class="otp-input" maxlength="1" data-index="4">
+                <input type="text" class="otp-input" maxlength="1" data-index="5">
+            </div>
+            <input type="hidden" name="otp" id="otpValue">
+            <button type="submit" class="btn"><i class="fas fa-check-circle"></i> Verify Email</button>
+        </form>
+
+        <div class="timer">Code expires in <span id="countdown">10:00</span></div>
+        <div class="resend">
+            Didn't receive it? <a href="{% url 'resend_otp' %}">Resend OTP</a>
+        </div>
+    </div>
+
+<script>
+    // OTP input auto-focus
+    const inputs = document.querySelectorAll('.otp-input');
+    inputs.forEach((input, i) => {
+        input.addEventListener('input', (e) => {
+            if (e.target.value && i < inputs.length - 1) inputs[i+1].focus();
+            updateOTP();
+        });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && i > 0) inputs[i-1].focus();
+        });
+    });
+
+    function updateOTP() {
+        document.getElementById('otpValue').value = Array.from(inputs).map(i => i.value).join('');
+    }
+
+    // Countdown timer
+    let seconds = 600;
+    const countdown = document.getElementById('countdown');
+    const timer = setInterval(() => {
+        seconds--;
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        countdown.textContent = `${m}:${s}`;
+        if (seconds <= 0) { clearInterval(timer); countdown.textContent = 'Expired'; }
+    }, 1000);
+
+    // Auto-submit when all 6 digits entered
+    inputs[5].addEventListener('input', () => {
+        if (Array.from(inputs).every(i => i.value)) {
+            updateOTP();
+            setTimeout(() => document.getElementById('otpForm').submit(), 300);
+        }
+    });
+</script>
+</body>
+</html>

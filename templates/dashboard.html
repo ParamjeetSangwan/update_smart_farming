@@ -4,89 +4,315 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SmartFarming Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarming | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background-image: url("{% static 'images/background.jpg' %}");
-            background-size: cover;
-            background-position: center;
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5c35 60%, #0f3d22 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: rgba(37,162,68,0.08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -200px; left: -200px;
+            width: 500px; height: 500px;
+            background: rgba(37,162,68,0.06);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
             color: white;
         }
-        header {
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px;
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px 6px 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #25a244, #4cca6e);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: rgba(255,71,87,0.15);
+            color: #ff6b7a;
+            border: 1px solid rgba(255,71,87,0.25);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-logout:hover { background: rgba(255,71,87,0.25); }
+
+        /* MAIN */
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        .welcome-section {
             text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            border-bottom: 2px solid #00ffcc;
+            margin-bottom: 52px;
+            animation: fadeUp 0.5s ease;
         }
-        .container {
-            max-width: 1000px;
-            margin: 50px auto;
-            padding: 0 20px;
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        h2 {
-            text-align: center;
-            margin-bottom: 30px;
+
+        .welcome-emoji {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 14px;
+            filter: drop-shadow(0 4px 16px rgba(37,162,68,0.4));
+            animation: float 3s ease-in-out infinite;
         }
-        .grid {
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .welcome-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .welcome-title span { color: #4cca6e; }
+
+        .welcome-subtitle {
+            font-size: 16px;
+            color: rgba(255,255,255,0.55);
+        }
+
+        /* GRID */
+        .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
+            gap: 20px;
         }
+
         .card {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            padding: 30px;
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 28px 24px;
             text-align: center;
             text-decoration: none;
-            color: #00ffcc;
-            font-size: 20px;
-            transition: background 0.3s, transform 0.3s;
+            color: white;
+            transition: all 0.25s cubic-bezier(.4,0,.2,1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.5s ease both;
         }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #25a244, #4cca6e);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
         .card:hover {
-            background: rgba(0, 0, 0, 0.7);
-            transform: translateY(-5px);
+            background: rgba(255,255,255,0.13);
+            transform: translateY(-6px);
+            border-color: rgba(37,162,68,0.4);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.3);
         }
-        .logout {
-            margin-top: 40px;
-            text-align: center;
+
+        .card:hover::before { opacity: 1; }
+
+        .card-emoji {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 14px;
+            transition: transform 0.2s;
         }
-        .logout button {
-            padding: 10px 25px;
-            background-color: #00ffcc;
-            border: none;
-            border-radius: 5px;
+
+        .card:hover .card-emoji { transform: scale(1.15); }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
             font-size: 16px;
-            color: black;
-            cursor: pointer;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: white;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.5;
+        }
+
+        /* Animation delays */
+        .card:nth-child(1) { animation-delay: 0.05s; }
+        .card:nth-child(2) { animation-delay: 0.10s; }
+        .card:nth-child(3) { animation-delay: 0.15s; }
+        .card:nth-child(4) { animation-delay: 0.20s; }
+        .card:nth-child(5) { animation-delay: 0.25s; }
+        .card:nth-child(6) { animation-delay: 0.30s; }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-bottom: 32px;
+            color: rgba(255,255,255,0.25);
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .welcome-title { font-size: 26px; }
+            .topbar { padding: 0 16px; }
+            .main { padding: 32px 16px; }
         }
     </style>
 </head>
 <body>
-    <header>SmartFarming Dashboard</header>
 
-    <div class="container">
-        <h2>Welcome, {{ name }}</h2>
-
-        <div class="grid">
-            <a href="{% url 'weather' %}" class="card">🌤 Weather</a>
-            <a href="{% url 'crop_suggestion' %}" class="card">🌱 Crop Suggestion</a>
-            <a href="{% url 'marketplace:marketplace_home' %}" class="card">🛒 Marketplace</a>
-            <a href="{% url 'ai_recommendations' %}" class="card">🤖 AI Recommendations</a>
-            <a href="{% url 'marketplace:my_orders' %}" class="card">📦 My Orders</a>
-            <a href="{% url 'profile' %}" class="card">👤 Profile</a>
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-brand">
+            🌾 SmartFarming
         </div>
-
-        <div class="logout">
-            <form method="post" action="{% url 'logout' %}">
+        <div class="topbar-right">
+            <div class="topbar-user">
+                <div class="user-avatar">{{ name|first|upper }}</div>
+                {{ name }}
+            </div>
+            <form method="post" action="{% url 'logout' %}" style="display:inline;">
                 {% csrf_token %}
-                <button type="submit">Logout</button>
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
             </form>
         </div>
-    </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main">
+        <div class="welcome-section">
+            <span class="welcome-emoji">🌾</span>
+            <div class="welcome-title">Welcome back, <span>{{ name }}</span>!</div>
+            <div class="welcome-subtitle">What would you like to do today?</div>
+        </div>
+
+        <div class="cards-grid">
+            <a href="{% url 'weather' %}" class="card">
+                <span class="card-emoji">🌤️</span>
+                <div class="card-title">Weather</div>
+                <div class="card-desc">Check real-time weather for your farm location</div>
+            </a>
+
+            <a href="{% url 'crop_suggestion' %}" class="card">
+                <span class="card-emoji">🌱</span>
+                <div class="card-title">Crop Suggestion</div>
+                <div class="card-desc">Get smart recommendations based on soil & climate</div>
+            </a>
+
+            <a href="{% url 'marketplace:marketplace_home' %}" class="card">
+                <span class="card-emoji">🛒</span>
+                <div class="card-title">Marketplace</div>
+                <div class="card-desc">Browse tools, equipment and pesticides</div>
+            </a>
+
+            <a href="{% url 'ai_recommendations' %}" class="card">
+                <span class="card-emoji">🤖</span>
+                <div class="card-title">AI Recommendations</div>
+                <div class="card-desc">Ask AI for personalized farming advice</div>
+            </a>
+
+            <a href="{% url 'marketplace:my_orders' %}" class="card">
+                <span class="card-emoji">📦</span>
+                <div class="card-title">My Orders</div>
+                <div class="card-desc">Track and manage your marketplace orders</div>
+            </a>
+
+            <a href="{% url 'profile' %}" class="card">
+                <span class="card-emoji">👤</span>
+                <div class="card-title">Profile</div>
+                <div class="card-desc">Update your name, location and preferences</div>
+            </a>
+        </div>
+    </main>
+
+    <div class="footer">© 2025 SmartFarming — Empowering farmers with technology 🌾</div>
+
 </body>
 </html>

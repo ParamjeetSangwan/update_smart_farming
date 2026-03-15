@@ -1,0 +1,111 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Orders — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Order Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Order Management</h1>
+    <p class="page-subtitle">View and manage all customer orders</p>
+</div>
+
+<!-- Stats -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px;">
+    <div class="stat-card orange" style="padding:16px;">
+        <div class="stat-value" style="font-size:24px;">{{ total_orders }}</div>
+        <div class="stat-label">Total Orders</div>
+    </div>
+    <div class="stat-card green" style="padding:16px;">
+        <div class="stat-value" style="font-size:22px;">₹{{ total_revenue|floatformat:0 }}</div>
+        <div class="stat-label">Total Revenue</div>
+    </div>
+</div>
+
+<!-- Search & Filter -->
+<div class="table-card" style="margin-bottom:20px;padding:18px 24px;">
+    <form method="GET" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <div style="flex:1;min-width:200px;position:relative;">
+            <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:13px;"></i>
+            <input type="text" name="q" value="{{ search }}" placeholder="Search by customer or order ID..."
+                style="width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;">
+        </div>
+        <input type="date" name="date_from" value="{{ date_from }}"
+            style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;color:var(--gray-800);">
+        <input type="date" name="date_to" value="{{ date_to }}"
+            style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;color:var(--gray-800);">
+        <button type="submit" style="padding:9px 20px;background:var(--green-bright);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
+            <i class="fas fa-search"></i> Filter
+        </button>
+        {% if search or date_from or date_to %}
+        <a href="{% url 'admin_orders' %}" style="padding:9px 16px;background:var(--gray-100);color:var(--gray-600);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">
+            <i class="fas fa-times"></i> Clear
+        </a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Orders Table -->
+<div class="table-card">
+    <div class="table-header">
+        <span class="table-title">All Orders <span style="font-size:12px;color:var(--gray-400);">({{ total_orders }})</span></span>
+    </div>
+    <div style="overflow-x:auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong style="color:var(--green-bright);">#{{ order.id }}</strong></td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--green-bright),var(--green-light));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;">
+                            {{ order.user.username|first|upper }}
+                        </div>
+                        <div>
+                            <div style="font-weight:600;font-size:13px;">{{ order.user.username }}</div>
+                            <div style="font-size:11px;color:var(--gray-400);">{{ order.user.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span style="font-size:13px;color:var(--gray-600);">{{ order.items.count }} item(s)</span>
+                    <div style="font-size:11px;color:var(--gray-400);">
+                        {% for item in order.items.all|slice:":2" %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        {% if order.items.count > 2 %}...{% endif %}
+                    </div>
+                </td>
+                <td style="font-weight:700;color:var(--green-bright);font-size:15px;">₹{{ order.total_price }}</td>
+                <td style="font-size:12px;color:var(--gray-400);">{{ order.created_at|date:"M d, Y" }}<br>{{ order.created_at|time:"H:i" }}</td>
+                <td>
+                    <div style="display:flex;gap:6px;">
+                        <a href="{% url 'admin_order_detail' order.id %}" style="width:30px;height:30px;border-radius:7px;background:rgba(59,130,246,0.1);color:var(--accent-blue);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:12px;">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <form method="POST" action="{% url 'admin_order_delete' order.id %}" onsubmit="return confirm('Delete Order #{{ order.id }}?')">
+                            {% csrf_token %}
+                            <button type="submit" style="width:30px;height:30px;border-radius:7px;background:rgba(255,71,87,0.1);color:var(--accent-red);border:none;cursor:pointer;font-size:12px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray-400);">
+                <i class="fas fa-shopping-bag" style="font-size:32px;margin-bottom:10px;display:block;opacity:0.3;"></i>
+                No orders found
+            </td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}

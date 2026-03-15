@@ -1,0 +1,57 @@
+<!-- product_list.html -->
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="product-list">
+    <h1>Product List</h1>
+    <form method="get" class="search-filter-form">
+        <input type="text" name="search" placeholder="Search name/description" value="{{ search }}">
+        <input type="text" name="category" placeholder="Category" value="{{ filter_category }}">
+        <button type="submit">Filter</button>
+    </form>
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Type</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in page_obj %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.description|truncatechars:40 }}</td>
+                    <td>{% if product.category %}{{ product.category }}{% else %}N/A{% endif %}</td>
+                    <td>₹{{ product.price }}</td>
+                    <td>{% if product.__class__.__name__ == 'Tool' %}Tool{% else %}Pesticide{% endif %}</td>
+                    <td>{% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}" width="50">{% else %}N/A{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+    <div class="product-analytics">
+        <h2>Product Analytics</h2>
+        <div>
+            <h3>Products by Category</h3>
+            <ul>
+                {% for cat in products_by_category %}
+                    <li>{{ cat.category }} ({{ cat.count }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- Add more analytics as needed -->
+    </div>
+</div>
+{% endblock %}

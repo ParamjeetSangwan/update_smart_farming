@@ -1,0 +1,40 @@
+<!-- sales_report.html -->
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="sales-report">
+    <h1>Sales Report</h1>
+    <form method="get" class="date-filter-form">
+        <input type="date" name="start_date" value="{{ start_date }}">
+        <input type="date" name="end_date" value="{{ end_date }}">
+        <button type="submit">Filter</button>
+        <button type="button" onclick="window.print()">Print</button>
+        <!-- Export buttons (CSV, Excel) can be added here -->
+    </form>
+    <div class="sales-summary">
+        <h2>Total Sales: ₹{{ total_sales }}</h2>
+    </div>
+    <table class="sales-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Total Price</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>₹{{ order.total_price }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.created_at }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Add charts and export options as needed -->
+</div>
+{% endblock %}

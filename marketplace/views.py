@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Tool, Pesticide, Order, OrderItem
+from .models import Tool, Pesticide
+from orders.models import Order, OrderItem
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 

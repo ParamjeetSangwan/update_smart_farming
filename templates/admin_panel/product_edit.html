@@ -1,0 +1,56 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Edit {{ product_type|capfirst }} — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Products / Edit {{ product_type|capfirst }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Edit {{ product_type|capfirst }}: {{ product.name }}</h1>
+</div>
+<div class="chart-card" style="max-width:700px;">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div style="margin-bottom:18px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Name *</label>
+            <input type="text" name="name" value="{{ product.name }}" required
+                style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+        </div>
+        <div style="margin-bottom:18px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Description *</label>
+            <textarea name="description" required rows="4"
+                style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">{{ product.description }}</textarea>
+        </div>
+        <div style="margin-bottom:18px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Price (₹) *</label>
+            <input type="number" name="price" value="{{ product.price }}" required step="0.01" min="0"
+                style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+        </div>
+        {% if product_type == 'tool' %}
+        <div style="margin-bottom:18px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Category</label>
+            <input type="text" name="category" value="{{ product.category }}"
+                style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+        </div>
+        {% endif %}
+        <div style="margin-bottom:24px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Product Image</label>
+            {% if product.image %}
+            <div style="margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+                <img src="{{ product.image.url }}" style="width:60px;height:60px;border-radius:10px;object-fit:cover;border:1px solid var(--gray-200);">
+                <span style="font-size:12px;color:var(--gray-400);">Current image — upload new to replace</span>
+            </div>
+            {% endif %}
+            <input type="file" name="image" accept="image/*"
+                style="width:100%;padding:10px 14px;border:1.5px dashed var(--gray-200);border-radius:8px;font-size:13px;cursor:pointer;">
+        </div>
+        <div style="display:flex;gap:12px;">
+            <button type="submit" style="flex:1;padding:12px;background:var(--green-bright);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <a href="{% url 'admin_products' %}" style="flex:1;padding:12px;background:var(--gray-100);color:var(--gray-600);border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;text-align:center;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

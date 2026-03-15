@@ -1,0 +1,97 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Add Product — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Products / Add Product{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Add New Product</h1>
+    <p class="page-subtitle">Add a new tool or pesticide to the marketplace</p>
+</div>
+
+<div class="chart-card" style="max-width:700px;">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Product Type -->
+        <div style="margin-bottom:20px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:8px;">Product Type *</label>
+            <div style="display:flex;gap:12px;">
+                <label style="flex:1;display:flex;align-items:center;gap:10px;padding:14px 18px;border:2px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all 0.2s;" id="toolLabel">
+                    <input type="radio" name="product_type" value="tool" checked onchange="toggleCategory(true)" style="accent-color:var(--green-bright);">
+                    <span style="font-size:20px;">🔧</span>
+                    <div>
+                        <div style="font-weight:600;font-size:14px;">Tool</div>
+                        <div style="font-size:11px;color:var(--gray-400);">Farm equipment & tools</div>
+                    </div>
+                </label>
+                <label style="flex:1;display:flex;align-items:center;gap:10px;padding:14px 18px;border:2px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all 0.2s;" id="pesticideLabel">
+                    <input type="radio" name="product_type" value="pesticide" onchange="toggleCategory(false)" style="accent-color:var(--green-bright);">
+                    <span style="font-size:20px;">🧪</span>
+                    <div>
+                        <div style="font-weight:600;font-size:14px;">Pesticide</div>
+                        <div style="font-size:11px;color:var(--gray-400);">Chemicals & sprays</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Name -->
+        <div style="margin-bottom:18px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Product Name *</label>
+            <input type="text" name="name" required placeholder="e.g. Hand Trowel, Neem Oil Spray"
+                style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border 0.2s;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+        </div>
+
+        <!-- Description -->
+        <div style="margin-bottom:18px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Description *</label>
+            <textarea name="description" required rows="4" placeholder="Describe the product..."
+                style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;transition:border 0.2s;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'"></textarea>
+        </div>
+
+        <!-- Price -->
+        <div style="margin-bottom:18px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Price (₹) *</label>
+            <div style="position:relative;">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:14px;">₹</span>
+                <input type="number" name="price" required step="0.01" min="0" placeholder="0.00"
+                    style="width:100%;padding:10px 14px 10px 28px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border 0.2s;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+        </div>
+
+        <!-- Category (Tools only) -->
+        <div id="categoryField" style="margin-bottom:18px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Category</label>
+            <input type="text" name="category" placeholder="e.g. Hand Tools, Power Tools, Irrigation"
+                style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border 0.2s;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+        </div>
+
+        <!-- Image -->
+        <div style="margin-bottom:24px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Product Image (Optional)</label>
+            <input type="file" name="image" accept="image/*"
+                style="width:100%;padding:10px 14px;border:1.5px dashed var(--gray-200);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;">
+        </div>
+
+        <!-- Buttons -->
+        <div style="display:flex;gap:12px;">
+            <button type="submit" style="flex:1;padding:12px;background:var(--green-bright);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;">
+                <i class="fas fa-plus"></i> Add Product
+            </button>
+            <a href="{% url 'admin_products' %}" style="flex:1;padding:12px;background:var(--gray-100);color:var(--gray-600);border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;text-align:center;display:inline-block;">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+function toggleCategory(show) {
+    document.getElementById('categoryField').style.display = show ? 'block' : 'none';
+}
+</script>
+{% endblock %}

@@ -3,95 +3,262 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Marketplace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarming | Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background-image: url("{% static 'images/background.jpg' %}");
-            background-size: cover;
-            background-position: center;
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5c35 60%, #0f3d22 100%);
             color: white;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 60px auto;
-            padding: 0 20px;
-            text-align: center;
+        .topbar {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 0 32px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
         }
 
-        h2 {
-            font-size: 36px;
-            margin-bottom: 40px;
-            color: #00ffcc;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .card {
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 15px;
-            padding: 40px 30px;
-            text-decoration: none;
-            color: #00ffcc;
-            font-size: 24px;
-            transition: 0.3s ease;
-        }
-
-        .card:hover {
-            background-color: rgba(0, 0, 0, 0.7);
-            transform: scale(1.05);
-        }
-
-        .card span {
-            font-size: 50px;
-            display: block;
-            margin-bottom: 15px;
-        }
+        .topbar-brand { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: white; }
 
         .back-btn {
-            margin-top: 50px;
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px; background: rgba(255,255,255,0.1);
+            color: white; border-radius: 8px; text-decoration: none;
+            font-size: 13px; font-weight: 600; transition: all 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.18); }
+
+        .main { max-width: 1000px; margin: 0 auto; padding: 60px 24px; }
+
+        /* HERO */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeUp 0.5s ease;
         }
 
-        .back-btn a {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: #00ffcc;
-            color: black;
-            border-radius: 6px;
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(37,162,68,0.15);
+            border: 1px solid rgba(37,162,68,0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4cca6e;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 44px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 14px;
+        }
+
+        .hero-title span { color: #4cca6e; }
+
+        .hero-subtitle {
+            font-size: 16px;
+            color: rgba(255,255,255,0.5);
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* CATEGORY CARDS */
+        .categories {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 48px;
+            animation: fadeUp 0.5s ease 0.1s both;
+        }
+
+        .cat-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 40px 32px;
             text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            color: white;
+            transition: all 0.3s cubic-bezier(.4,0,.2,1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
-        .back-btn a:hover {
-            background-color: #00ddaa;
+        .cat-card::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; right: -60px;
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .cat-card.tools::after { background: rgba(37,162,68,0.1); }
+        .cat-card.pesticides::after { background: rgba(59,130,246,0.1); }
+
+        .cat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .cat-card.tools:hover { border-color: rgba(37,162,68,0.4); background: rgba(37,162,68,0.1); }
+        .cat-card.pesticides:hover { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.08); }
+
+        .cat-icon-wrap {
+            width: 64px; height: 64px;
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .cat-card.tools .cat-icon-wrap { background: rgba(37,162,68,0.2); }
+        .cat-card.pesticides .cat-icon-wrap { background: rgba(59,130,246,0.2); }
+
+        .cat-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .cat-desc {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .cat-arrow {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: auto;
+        }
+
+        .cat-card.tools .cat-arrow { color: #4cca6e; }
+        .cat-card.pesticides .cat-arrow { color: #60a5fa; }
+
+        /* QUICK LINKS */
+        .quick-links {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeUp 0.5s ease 0.2s both;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 20px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .quick-link:hover {
+            background: rgba(255,255,255,0.13);
+            color: white;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .categories { grid-template-columns: 1fr; }
+            .hero-title { font-size: 30px; }
+            .topbar { padding: 0 16px; }
+            .main { padding: 36px 16px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Marketplace</h2>
 
-        <div class="grid">
-            <a href="{% url 'marketplace:tools_view' %}" class="card">
-                <span>🛠</span>
-                Tools
+    <header class="topbar">
+        <div class="topbar-brand">🌾 SmartFarming</div>
+        <a href="{% url 'dashboard' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Dashboard
+        </a>
+    </header>
+
+    <main class="main">
+
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-badge">
+                <i class="fas fa-store"></i> Farm Marketplace
+            </div>
+            <div class="hero-title">
+                Everything your farm<br><span>needs, delivered.</span>
+            </div>
+            <div class="hero-subtitle">
+                Browse premium agricultural tools and effective pesticides for your farming needs
+            </div>
+        </div>
+
+        <!-- CATEGORIES -->
+        <div class="categories">
+            <a href="{% url 'marketplace:tools_view' %}" class="cat-card tools">
+                <div class="cat-icon-wrap">🔧</div>
+                <div class="cat-title">Farm Tools</div>
+                <div class="cat-desc">Hand tools, power equipment, irrigation systems and everything you need to work your land efficiently.</div>
+                <div class="cat-arrow">
+                    Browse Tools <i class="fas fa-arrow-right"></i>
+                </div>
             </a>
-            <a href="{% url 'marketplace:pesticides_view' %}" class="card">
-                <span>🌿</span>
-                Pesticides & Fertilizers
+
+            <a href="{% url 'marketplace:pesticides_view' %}" class="cat-card pesticides">
+                <div class="cat-icon-wrap">🧪</div>
+                <div class="cat-title">Pesticides & Fertilizers</div>
+                <div class="cat-desc">Effective crop protection products, organic fertilizers and soil enhancers for maximum yield.</div>
+                <div class="cat-arrow">
+                    Browse Pesticides <i class="fas fa-arrow-right"></i>
+                </div>
             </a>
         </div>
 
-        <div class="back-btn">
-            <a href="{% url 'dashboard' %}">← Back to Dashboard</a>
+        <!-- QUICK LINKS -->
+        <div class="quick-links">
+            <a href="{% url 'marketplace:cart_view' %}" class="quick-link">
+                <i class="fas fa-shopping-cart"></i> View Cart
+            </a>
+            <a href="{% url 'marketplace:my_orders' %}" class="quick-link">
+                <i class="fas fa-box"></i> My Orders
+            </a>
+            <a href="{% url 'dashboard' %}" class="quick-link">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
         </div>
-    </div>
+
+    </main>
 </body>
 </html>

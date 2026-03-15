@@ -22,24 +22,3 @@ class Pesticide(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='marketplace_orders')
-    total_price = models.FloatField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Order #{self.id} - {self.user.username}"
-
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
-    item_type = models.CharField(max_length=50)  # 'tool' or 'pesticide'
-    item_id = models.PositiveIntegerField()
-    name = models.CharField(max_length=100)
-    price = models.FloatField()
-    quantity = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"{self.name} x {self.quantity}"

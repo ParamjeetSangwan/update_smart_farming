@@ -1,0 +1,63 @@
+<!-- order_list.html -->
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="order-list">
+    <h1>Order List</h1>
+    <form method="get" class="search-filter-form">
+        <input type="text" name="search" placeholder="Search order ID/user" value="{{ search }}">
+        <input type="text" name="status" placeholder="Status" value="{{ filter_status }}">
+        <input type="date" name="date" value="{{ filter_date }}">
+        <input type="number" name="amount_min" placeholder="Min Amount" value="{{ filter_amount_min }}">
+        <input type="number" name="amount_max" placeholder="Max Amount" value="{{ filter_amount_max }}">
+        <button type="submit">Filter</button>
+    </form>
+    <table class="order-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Total Price</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in page_obj %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>₹{{ order.total_price }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.created_at }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+    <div class="order-analytics">
+        <h2>Order Analytics</h2>
+        <ul>
+            <li>Total Orders Today: {{ total_orders_today }}</li>
+            <li>Total Orders This Week: {{ total_orders_week }}</li>
+            <li>Total Orders This Month: {{ total_orders_month }}</li>
+            <li>Revenue Today: ₹{{ revenue_today }}</li>
+            <li>Revenue This Week: ₹{{ revenue_week }}</li>
+            <li>Revenue This Month: ₹{{ revenue_month }}</li>
+        </ul>
+        <h3>Orders by Status</h3>
+        <ul>
+            {% for status in orders_by_status %}
+                <li>{{ status.status }}: {{ status.count }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

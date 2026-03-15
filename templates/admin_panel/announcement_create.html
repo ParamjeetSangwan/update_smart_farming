@@ -1,0 +1,60 @@
+{% extends "base_admin.html" %}
+{% block title %}New Announcement — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Announcements / New{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">📢 New Announcement</h1>
+    <p class="page-subtitle">Send a message to all active SmartFarming users</p>
+</div>
+
+<div class="chart-card" style="max-width:680px;">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--green-deep);margin-bottom:7px;">
+                Announcement Title *
+            </label>
+            <input type="text" name="title" required placeholder="e.g. New Products Available, System Maintenance..."
+                style="width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border 0.2s;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--green-deep);margin-bottom:7px;">
+                Message *
+            </label>
+            <textarea name="message" required rows="5" placeholder="Write your announcement message here..."
+                style="width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;transition:border 0.2s;"
+                onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'"></textarea>
+        </div>
+
+        <!-- Send Email Option -->
+        <div style="margin-bottom:28px;padding:16px 18px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:12px;">
+            <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                <input type="checkbox" name="send_email" style="width:18px;height:18px;accent-color:var(--accent-blue);">
+                <div>
+                    <div style="font-size:14px;font-weight:600;color:var(--green-deep);">
+                        <i class="fas fa-envelope" style="color:var(--accent-blue);"></i> Also send as Email
+                    </div>
+                    <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">
+                        Send this announcement to all users' email addresses
+                    </div>
+                </div>
+            </label>
+        </div>
+
+        <div style="display:flex;gap:12px;">
+            <button type="submit"
+                style="flex:1;padding:13px;background:var(--green-bright);color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;">
+                <i class="fas fa-paper-plane"></i> Send Announcement
+            </button>
+            <a href="{% url 'admin_announcements' %}"
+                style="flex:1;padding:13px;background:var(--gray-100);color:var(--gray-600);border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base_admin.html" %}
+{% block title %}Recent Activity — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Recent Activity{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Recent Activity</h1>
+    <p class="page-subtitle">All recent actions performed by users on SmartFarm</p>
+</div>
+
+<div class="table-card">
+    <div class="table-header">
+        <span class="table-title">Activity Feed</span>
+        <span style="font-size:12px;color:var(--gray-400);">{{ total_activities }} total activities</span>
+    </div>
+    <div class="activity-list">
+
+        {% for item in activities %}
+        <div class="activity-item">
+            <div class="activity-dot {{ item.type }}">
+                <i class="fas fa-{{ item.icon }}"></i>
+            </div>
+            <div style="flex:1;">
+                <div class="activity-text">{{ item.text|safe }}</div>
+                <div class="activity-time">{{ item.time|timesince }} ago</div>
+            </div>
+            {% if item.link %}
+            <a href="{{ item.link }}"
+                style="font-size:12px;color:var(--green-bright);font-weight:600;text-decoration:none;padding:4px 10px;background:var(--green-pale);border-radius:6px;white-space:nowrap;">
+                View →
+            </a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div style="text-align:center;padding:60px;color:var(--gray-400);">
+            <i class="fas fa-history" style="font-size:40px;opacity:0.3;display:block;margin-bottom:12px;"></i>
+            No activity yet
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

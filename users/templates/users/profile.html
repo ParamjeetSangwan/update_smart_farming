@@ -1,63 +1,207 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Profile</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarming | Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            background-image: url("{% static 'images/background.jpg' %}");
-            background-size: cover;
-            background-position: center;
-            font-family: Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            font-family: 'DM Sans', sans-serif; min-height: 100vh;
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5c35 60%, #0f3d22 100%);
+            display: flex; flex-direction: column;
         }
-        .profile-box {
-            background: rgba(255,255,255,0.95);
-            padding: 30px;
-            border-radius: 16px;
-            width: 400px;
+        .topbar {
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 0 32px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
         }
-        .profile-box h2 {
-            text-align: center;
+        .topbar-brand { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: white; }
+        .back-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px; background: rgba(255,255,255,0.1);
+            color: white; border-radius: 8px; text-decoration: none;
+            font-size: 13px; font-weight: 600; transition: all 0.2s;
         }
-        .profile-box input, .profile-box button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
+        .back-btn:hover { background: rgba(255,255,255,0.18); }
+        .main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+        .profile-card {
+            background: white; border-radius: 20px; width: 100%; max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden;
+            animation: fadeUp 0.4s ease;
         }
-        .back-button:hover{
-            background-color: #ffffff55;
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .profile-header {
+            background: linear-gradient(135deg, #0a2e1a, #1a5c35);
+            padding: 36px 32px; text-align: center; position: relative;
         }
-        .back-button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #0f0f0f33;
-            color: rgb(24, 21, 21);
-            text-decoration: none;
-            border-radius: 8px;
-            border: 1px solid #fff;
-            transition: background-color 0.3s;
+        /* Avatar Upload */
+        .avatar-wrap {
+            position: relative; display: inline-block; margin-bottom: 14px;
+        }
+        .avatar {
+            width: 90px; height: 90px; border-radius: 22px;
+            background: linear-gradient(135deg, #25a244, #4cca6e);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800;
+            color: white; box-shadow: 0 8px 24px rgba(37,162,68,0.4);
+            overflow: hidden;
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-upload-btn {
+            position: absolute; bottom: -4px; right: -4px;
+            width: 28px; height: 28px;
+            background: #25a244; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 2px solid white;
+            color: white; font-size: 11px; transition: all 0.2s;
+        }
+        .avatar-upload-btn:hover { background: #1a7a35; transform: scale(1.1); }
+        .profile-name { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: white; margin-bottom: 4px; }
+        .profile-username { font-size: 13px; color: rgba(255,255,255,0.55); }
+        .profile-form { padding: 32px; }
+        .form-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: #0a2e1a; margin-bottom: 24px; }
+        .info-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #8fa99a; margin-bottom: 6px; }
+        .info-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px; background: #f8faf9; border-radius: 10px;
+            border: 1px solid #d8e2dc; margin-bottom: 20px;
+        }
+        .info-row i { color: #8fa99a; font-size: 14px; width: 16px; }
+        .info-row span { font-size: 14px; color: #4a6358; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #1e2e28; margin-bottom: 7px; }
+        .input-wrap { position: relative; }
+        .input-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #8fa99a; font-size: 14px; }
+        .form-group input {
+            width: 100%; padding: 11px 14px 11px 40px;
+            border: 1.5px solid #d8e2dc; border-radius: 10px;
+            font-size: 14px; font-family: 'DM Sans', sans-serif;
+            color: #1e2e28; outline: none; transition: all 0.2s; background: #f8faf9;
+        }
+        .form-group input:focus { border-color: #25a244; box-shadow: 0 0 0 3px rgba(37,162,68,0.1); background: white; }
+        .alert { padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .alert-success { background: rgba(37,162,68,0.08); color: #1a7a35; border: 1px solid rgba(37,162,68,0.2); }
+        .alert-error { background: rgba(255,71,87,0.08); color: #c0392b; border: 1px solid rgba(255,71,87,0.2); }
+        .btn-save {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, #25a244, #4cca6e);
+            color: white; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(37,162,68,0.35);
+        }
+        .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,162,68,0.4); }
+        .notif-link {
+            display: flex; align-items: center; gap: 8px; justify-content: center;
+            margin-top: 14px; font-size: 13px; color: #25a244;
+            text-decoration: none; font-weight: 600;
+        }
+        .notif-link:hover { text-decoration: underline; }
+        .notif-badge {
+            background: #ff4757; color: white; font-size: 10px; font-weight: 700;
+            padding: 2px 6px; border-radius: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="profile-box">
-        <h2>Edit Profile</h2>
-        <form method="post">
-            {% csrf_token %}
-            <label>Name:</label>
-            <input type="text" name="name" value="{{ name }}" required>
+    <header class="topbar">
+        <div class="topbar-brand">🌾 SmartFarming</div>
+        <a href="{% url 'dashboard' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Dashboard
+        </a>
+    </header>
 
-            <label>Location:</label>
-            <input type="text" name="location" value="{{ location }}" required>
+    <main class="main">
+        <div class="profile-card">
+            <div class="profile-header">
+                <form method="POST" enctype="multipart/form-data" id="avatarForm">
+                    {% csrf_token %}
+                    <div class="avatar-wrap">
+                        <div class="avatar">
+                            {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="Avatar" id="avatarPreview">
+                            {% else %}
+                            <span id="avatarInitial">{{ name|first|upper }}</span>
+                            {% endif %}
+                        </div>
+                        <label class="avatar-upload-btn" for="avatarInput" title="Change photo">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <input type="file" id="avatarInput" name="avatar" accept="image/*"
+                            style="display:none;" onchange="previewAvatar(this)">
+                    </div>
+                </form>
+                <div class="profile-name">{{ name }}</div>
+                <div class="profile-username">@{{ user.username }}</div>
+            </div>
 
-            <button type="submit">Save Changes</button>
-        </form>
-        <a href="{% url 'dashboard' %}" class="back-button">Back to Dashboard</a>
-    </div>
+            <div class="profile-form">
+                <div class="form-title">Edit Profile</div>
+
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <div class="info-label">Account Info</div>
+                <div class="info-row"><i class="fas fa-user"></i><span>{{ user.username }}</span></div>
+                <div class="info-row" style="margin-bottom:24px;"><i class="fas fa-envelope"></i><span>{{ user.email|default:"No email set" }}</span></div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-id-card"></i>
+                            <input type="text" name="name" value="{{ name }}" placeholder="Your full name" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" name="location" value="{{ location }}" placeholder="e.g. Punjab, India">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Profile Photo</label>
+                        <input type="file" name="avatar" accept="image/*" onchange="previewAvatar(this)"
+                            style="width:100%;padding:10px 14px;border:1.5px dashed #d8e2dc;border-radius:10px;font-size:13px;cursor:pointer;background:#f8faf9;">
+                        {% if profile.avatar %}
+                        <div style="margin-top:8px;font-size:12px;color:#8fa99a;">Current photo uploaded — select new to replace</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+                </form>
+
+                <a href="{% url 'notifications' %}" class="notif-link">
+                    <i class="fas fa-bell"></i> View Notifications
+                    {% if unread_count %}<span class="notif-badge">{{ unread_count }}</span>{% endif %}
+                </a>
+            </div>
+        </div>
+    </main>
+
+<script>
+function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const avatar = document.querySelector('.avatar');
+            avatar.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
 </body>
 </html>

@@ -1,0 +1,70 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Add Crop — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Crops / Add Crop{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Add New Crop</h1>
+    <p class="page-subtitle">Add a crop record to the recommendation database</p>
+</div>
+<div class="chart-card" style="max-width:700px;">
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Crop Name *</label>
+                <input type="text" name="crop" required placeholder="e.g. Wheat, Rice, Cotton"
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Country *</label>
+                <input type="text" name="country" required placeholder="e.g. India, USA"
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Soil Type *</label>
+                <input type="text" name="soil_type" required placeholder="e.g. Loamy, Sandy, Clay"
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Temperature *</label>
+                <input type="text" name="temperature" required placeholder="e.g. 15 to 25"
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Season *</label>
+                <select name="season" required style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;color:var(--gray-800);">
+                    <option value="">Select Season</option>
+                    <option value="Spring">Spring</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Fall">Fall</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Kharif">Kharif</option>
+                    <option value="Rabi">Rabi</option>
+                    <option value="Zaid">Zaid</option>
+                    <option value="Year-round">Year-round</option>
+                </select>
+            </div>
+            <div>
+                <label style="display:block;font-size:13px;font-weight:600;color:var(--gray-800);margin-bottom:6px;">Category *</label>
+                <input type="text" name="category" required placeholder="e.g. Cereal, Vegetable, Fruit"
+                    style="width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;"
+                    onfocus="this.style.borderColor='var(--green-bright)'" onblur="this.style.borderColor='var(--gray-200)'">
+            </div>
+        </div>
+        <div style="display:flex;gap:12px;">
+            <button type="submit" style="flex:1;padding:12px;background:var(--green-bright);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                <i class="fas fa-plus"></i> Add Crop
+            </button>
+            <a href="{% url 'admin_crops' %}" style="flex:1;padding:12px;background:var(--gray-100);color:var(--gray-600);border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;text-align:center;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

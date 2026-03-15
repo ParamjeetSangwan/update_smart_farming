@@ -1,0 +1,70 @@
+{% extends "base_admin.html" %}
+{% block title %}Announcements — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Announcements{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+        <h1 class="page-title">📢 Announcements</h1>
+        <p class="page-subtitle">Send announcements to all SmartFarming users</p>
+    </div>
+    <a href="{% url 'admin_announcement_create' %}"
+        style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:var(--green-bright);color:white;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;">
+        <i class="fas fa-plus"></i> New Announcement
+    </a>
+</div>
+
+<div class="table-card">
+    <div class="table-header">
+        <span class="table-title">All Announcements</span>
+        <span style="font-size:12px;color:var(--gray-400);">{{ announcements|length }} total</span>
+    </div>
+
+    {% if announcements %}
+    <div style="padding:8px 0;">
+        {% for ann in announcements %}
+        <div style="padding:18px 24px;border-bottom:1px solid var(--gray-100);display:flex;align-items:flex-start;gap:16px;transition:background 0.2s;"
+            onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background=''">
+            <div style="width:44px;height:44px;border-radius:12px;background:rgba(240,192,64,0.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">
+                📢
+            </div>
+            <div style="flex:1;">
+                <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--green-deep);margin-bottom:4px;">
+                    {{ ann.title }}
+                </div>
+                <div style="font-size:13px;color:var(--gray-600);margin-bottom:8px;line-height:1.5;">
+                    {{ ann.message|truncatechars:120 }}
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <span style="font-size:11px;color:var(--gray-400);">
+                        <i class="fas fa-clock"></i> {{ ann.created_at|date:"M d, Y H:i" }}
+                    </span>
+                    {% if ann.send_email %}
+                    <span style="font-size:11px;padding:2px 8px;background:rgba(59,130,246,0.1);color:var(--accent-blue);border-radius:20px;font-weight:600;">
+                        <i class="fas fa-envelope"></i> Email sent
+                    </span>
+                    {% endif %}
+                    <span style="font-size:11px;color:var(--gray-400);">
+                        By {{ ann.created_by.username }}
+                    </span>
+                </div>
+            </div>
+            <form method="POST" action="{% url 'admin_announcement_delete' ann.id %}"
+                onsubmit="return confirm('Delete this announcement?')">
+                {% csrf_token %}
+                <button type="submit"
+                    style="width:32px;height:32px;border-radius:8px;background:rgba(255,71,87,0.1);color:var(--accent-red);border:none;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:60px;color:var(--gray-400);">
+        <i class="fas fa-bullhorn" style="font-size:40px;opacity:0.3;display:block;margin-bottom:12px;"></i>
+        <p>No announcements yet. Create your first one!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

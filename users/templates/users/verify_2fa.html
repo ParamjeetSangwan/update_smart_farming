@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarming | Admin 2FA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif; min-height: 100vh;
+            background: linear-gradient(135deg, #0a2e1a 0%, #1a5c35 50%, #0f3d22 100%);
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .card {
+            background: white; border-radius: 20px; padding: 48px 44px;
+            width: 100%; max-width: 440px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center; animation: fadeUp 0.4s ease;
+        }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .icon { font-size: 52px; display: block; margin-bottom: 16px; }
+        .title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: #0a2e1a; margin-bottom: 8px; }
+        .subtitle { font-size: 14px; color: #8fa99a; margin-bottom: 28px; }
+        .otp-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; }
+        .otp-input {
+            width: 50px; height: 56px; border: 2px solid #d8e2dc; border-radius: 12px;
+            font-size: 22px; font-weight: 700; text-align: center;
+            font-family: 'Syne', sans-serif; color: #0a2e1a; outline: none; transition: all 0.2s;
+        }
+        .otp-input:focus { border-color: #25a244; box-shadow: 0 0 0 3px rgba(37,162,68,0.1); }
+        .btn {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, #25a244, #4cca6e);
+            color: white; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(37,162,68,0.35); margin-bottom: 16px;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .back-link { font-size: 13px; color: #25a244; text-decoration: none; font-weight: 600; }
+        .alert { padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .alert-error { background: rgba(255,71,87,0.08); color: #c0392b; border: 1px solid rgba(255,71,87,0.2); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <span class="icon">🔐</span>
+        <div class="title">Admin Verification</div>
+        <div class="subtitle">Enter the 6-digit OTP sent to<br><strong style="color:#25a244;">{{ email }}</strong></div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i> {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST" id="otpForm">
+            {% csrf_token %}
+            <div class="otp-inputs">
+                <input type="text" class="otp-input" maxlength="1">
+                <input type="text" class="otp-input" maxlength="1">
+                <input type="text" class="otp-input" maxlength="1">
+                <input type="text" class="otp-input" maxlength="1">
+                <input type="text" class="otp-input" maxlength="1">
+                <input type="text" class="otp-input" maxlength="1">
+            </div>
+            <input type="hidden" name="otp" id="otpValue">
+            <button type="submit" class="btn"><i class="fas fa-shield-alt"></i> Verify & Login</button>
+        </form>
+        <a href="{% url 'login' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Login</a>
+    </div>
+<script>
+    const inputs = document.querySelectorAll('.otp-input');
+    inputs.forEach((input, i) => {
+        input.addEventListener('input', (e) => {
+            if (e.target.value && i < inputs.length - 1) inputs[i+1].focus();
+            document.getElementById('otpValue').value = Array.from(inputs).map(i => i.value).join('');
+        });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && i > 0) inputs[i-1].focus();
+        });
+    });
+    inputs[0].focus();
+</script>
+</body>
+</html>

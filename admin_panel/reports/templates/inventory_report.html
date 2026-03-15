@@ -1,0 +1,67 @@
+<!-- inventory_report.html -->
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="inventory-report">
+    <h1>Inventory Report</h1>
+    <button type="button" onclick="window.print()">Print</button>
+    <!-- Export buttons (CSV, Excel) can be added here -->
+    <h2>Tools Inventory</h2>
+    <table class="tools-inventory-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tool in tools %}
+                <tr>
+                    <td>{{ tool.name }}</td>
+                    <td>{{ tool.category }}</td>
+                    <td>₹{{ tool.price }}</td>
+                    <td>{% if tool.stock %}{{ tool.stock }}{% else %}N/A{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Pesticides Inventory</h2>
+    <table class="pesticides-inventory-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pesticide in pesticides %}
+                <tr>
+                    <td>{{ pesticide.name }}</td>
+                    <td>₹{{ pesticide.price }}</td>
+                    <td>{% if pesticide.stock %}{{ pesticide.stock }}{% else %}N/A{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h3>Low Stock Alerts</h3>
+    <ul>
+        {% for tool in low_stock_tools %}
+            <li>Tool: {{ tool.name }} (Stock: {{ tool.stock }})</li>
+        {% endfor %}
+        {% for pesticide in low_stock_pesticides %}
+            <li>Pesticide: {{ pesticide.name }} (Stock: {{ pesticide.stock }})</li>
+        {% endfor %}
+    </ul>
+    <h3>Out of Stock Alerts</h3>
+    <ul>
+        {% for tool in out_of_stock_tools %}
+            <li>Tool: {{ tool.name }}</li>
+        {% endfor %}
+        {% for pesticide in out_of_stock_pesticides %}
+            <li>Pesticide: {{ pesticide.name }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

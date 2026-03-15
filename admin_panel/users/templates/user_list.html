@@ -1,0 +1,94 @@
+<!-- user_list.html -->
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="user-list">
+    <h1>User List</h1>
+    <form method="get" class="search-filter-form">
+        <input type="text" name="search" placeholder="Search username/email/name" value="{{ search }}">
+        <input type="text" name="location" placeholder="Location" value="{{ filter_location }}">
+        <select name="active">
+            <option value="">Active/Inactive</option>
+            <option value="true" {% if filter_active == 'true' %}selected{% endif %}>Active</option>
+            <option value="false" {% if filter_active == 'false' %}selected{% endif %}>Inactive</option>
+        </select>
+        <select name="has_orders">
+            <option value="">Has Orders?</option>
+            <option value="true" {% if filter_has_orders == 'true' %}selected{% endif %}>Has Orders</option>
+            <option value="false" {% if filter_has_orders == 'false' %}selected{% endif %}>No Orders</option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Date Joined</th>
+                <th>Active</th>
+                <th>Orders</th>
+                <th>Total Spent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in page_obj %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.profile.name }}</td>
+                    <td>{{ user.profile.location }}</td>
+                    <td>{{ user.date_joined }}</td>
+                    <td>{{ user.is_active|yesno:"Yes,No" }}</td>
+                    <td>{{ user.orders.count }}</td>
+                    <td>₹{{ user.orders.all|aggregate:'sum:total_price' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+    <div class="user-analytics">
+        <h2>User Analytics</h2>
+        <div>
+            <h3>Most Active Users</h3>
+            <ul>
+                {% for user in most_active_users %}
+                    <li>{{ user.username }} ({{ user.orders.count }} orders)</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <h3>Highest Spending Users</h3>
+            <ul>
+                {% for user in highest_spending_users %}
+                    <li>{{ user.username }} (₹{{ user.orders.all|aggregate:'sum:total_price' }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <h3>Users by Location</h3>
+            <ul>
+                {% for loc in users_by_location %}
+                    <li>{{ loc.profile__location }} ({{ loc.count }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <h3>New Users Trend</h3>
+            <ul>
+                {% for trend in new_users_trend %}
+                    <li>{{ trend.month }}: {{ trend.count }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

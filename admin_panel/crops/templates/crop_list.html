@@ -1,0 +1,66 @@
+<!-- crop_list.html -->
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="crop-list">
+    <h1>Crop List</h1>
+    <form method="get" class="search-filter-form">
+        <input type="text" name="search" placeholder="Search crop/country" value="{{ search }}">
+        <input type="text" name="country" placeholder="Country" value="{{ filter_country }}">
+        <input type="text" name="soil" placeholder="Soil Type" value="{{ filter_soil }}">
+        <input type="text" name="season" placeholder="Season" value="{{ filter_season }}">
+        <input type="text" name="category" placeholder="Category" value="{{ filter_category }}">
+        <button type="submit">Filter</button>
+    </form>
+    <table class="crop-table">
+        <thead>
+            <tr>
+                <th>Crop</th>
+                <th>Country</th>
+                <th>Soil Type</th>
+                <th>Temperature</th>
+                <th>Season</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for crop in page_obj %}
+                <tr>
+                    <td>{{ crop.crop }}</td>
+                    <td>{{ crop.country }}</td>
+                    <td>{{ crop.soil_type }}</td>
+                    <td>{{ crop.temperature }}</td>
+                    <td>{{ crop.season }}</td>
+                    <td>{{ crop.category }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+    </div>
+    <div class="crop-analytics">
+        <h2>Crop Analytics</h2>
+        <ul>
+            <li>Total Crops: {{ total_crops }}</li>
+        </ul>
+        <h3>Crops by Country</h3>
+        <ul>
+            {% for country in crops_by_country %}
+                <li>{{ country.country }}: {{ country.count }}</li>
+            {% endfor %}
+        </ul>
+        <h3>Crops by Season</h3>
+        <ul>
+            {% for season in crops_by_season %}
+                <li>{{ season.season }}: {{ season.count }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

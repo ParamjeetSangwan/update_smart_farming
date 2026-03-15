@@ -1,0 +1,51 @@
+{% extends "admin_panel/base_admin.html" %}
+{% block title %}Reports — SmartFarm Admin{% endblock %}
+{% block breadcrumb %}Reports & Analytics{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Reports & Analytics</h1>
+    <p class="page-subtitle">Overview of platform performance</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px;">
+    <div class="stat-card green" style="padding:16px;"><div class="stat-value" style="font-size:24px;">{{ total_users }}</div><div class="stat-label">Total Users</div></div>
+    <div class="stat-card orange" style="padding:16px;"><div class="stat-value" style="font-size:24px;">{{ total_orders }}</div><div class="stat-label">Total Orders</div></div>
+    <div class="stat-card gold" style="padding:16px;"><div class="stat-value" style="font-size:20px;">₹{{ total_revenue|floatformat:0 }}</div><div class="stat-label">Total Revenue</div></div>
+    <div class="stat-card blue" style="padding:16px;"><div class="stat-value" style="font-size:24px;">{{ total_crops }}</div><div class="stat-label">Crop Records</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div class="table-card">
+        <div class="table-header"><span class="table-title">🏆 Top Selling Products</span></div>
+        <table>
+            <thead><tr><th>Product</th><th>Sold</th><th>Revenue</th></tr></thead>
+            <tbody>
+                {% for p in top_products %}
+                <tr>
+                    <td style="font-weight:600;font-size:13px;">{{ p.name }}</td>
+                    <td><span class="status-badge delivered">{{ p.total_sold }}</span></td>
+                    <td style="font-weight:700;color:var(--green-bright);">₹{{ p.revenue|floatformat:0 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="text-align:center;padding:20px;color:var(--gray-400);">No data yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="table-card">
+        <div class="table-header"><span class="table-title">👑 Top Customers</span></div>
+        <table>
+            <thead><tr><th>Customer</th><th>Orders</th><th>Spent</th></tr></thead>
+            <tbody>
+                {% for c in top_customers %}
+                <tr>
+                    <td style="font-weight:600;font-size:13px;">{{ c.user__username }}</td>
+                    <td><span class="status-badge processing">{{ c.order_count }}</span></td>
+                    <td style="font-weight:700;color:var(--green-bright);">₹{{ c.total_spent|floatformat:0 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="text-align:center;padding:20px;color:var(--gray-400);">No data yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
